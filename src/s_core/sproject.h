@@ -37,7 +37,8 @@ public:
     bool containsTheme(const QString &title);
     bool addTheme(const QString &title);
     QString themeAlias(const QString &title);
-    //QString removeTheme(const QString &title);
+    void removeTheme(const QString &alias);
+    void decrimentTheme();
 
 signals:
 

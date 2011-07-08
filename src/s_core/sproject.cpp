@@ -102,3 +102,11 @@ QString SProject::themeAlias(const QString &title) {
 
     return QString();
 }
+
+void SProject::removeTheme(const QString &alias) {
+    themes.remove(alias);
+}
+
+void SProject::decrimentTheme() {
+    thmes_counter --;
+}
