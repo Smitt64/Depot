@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="new">toolbar/DocumentHS.png</file>
+        <file alias="open">toolbar/openHS.png</file>
+        <file alias="print">toolbar/PrintHS.png</file>
+        <file alias="saveall">toolbar/SaveAllHS.png</file>
+        <file alias="save">toolbar/saveHS.png</file>
+        <file alias="fullscreen">toolbar/FullScreenHS.png</file>
+        <file alias="legend">toolbar/LegendHS.png</file>
+        <file alias="book">icons/book.png</file>
+        <file alias="group">icons/group.png</file>
+        <file alias="quest">icons/question.png</file>
+        <file alias="redo">toolbar/Edit_RedoHS.png</file>
+        <file alias="undo">toolbar/Edit_UndoHS.png</file>
+        <file alias="addtheme">toolbar/add_theme.png</file>
+    </qresource>
+</RCC>
