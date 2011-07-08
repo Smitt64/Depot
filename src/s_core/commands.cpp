@@ -9,7 +9,8 @@ addThemeCommand::addThemeCommand(const QString &title, QUndoCommand *parent) :
 }
 
 void addThemeCommand::undo() {
-
+    S_PROJECT->removeTheme(theme_alias);
+    S_PROJECT->decrimentTheme();
 }
 
 void addThemeCommand::redo() {
