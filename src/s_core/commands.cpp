@@ -21,3 +21,22 @@ void addThemeCommand::redo() {
     setText(QString(QObject::tr("New theme: %1.\nAlias: %2"))
             .arg(theme_title, theme_alias));
 }
+
+//==================================================================================
+removeThemeCommand::removeThemeCommand(const QString &alias, QUndoCommand *parent) :
+    QUndoCommand(parent),
+    theme_alias(alias),
+    theme_title("")
+{
+}
+
+void removeThemeCommand::undo() {
+    S_PROJECT->addTheme(theme_title, theme_alias);
+}
+
+void removeThemeCommand::redo() {
+    theme_title = S_PROJECT->themeTitle(theme_alias);
+    S_PROJECT->removeTheme(theme_alias);
+    setText(QString(QObject::tr("Theme removed: %1"))
+            .arg(theme_title));
+}

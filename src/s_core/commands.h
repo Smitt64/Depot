@@ -1,5 +1,5 @@
-#ifndef ADDTHEMECOMMAND_H
-#define ADDTHEMECOMMAND_H
+#ifndef COMMAND_H
+#define COMMAND_H
 
 #include <QUndoCommand>
 
@@ -14,4 +14,15 @@ private:
     QString theme_title, theme_alias;
 };
 
-#endif // ADDTHEMECOMMAND_H
+class removeThemeCommand : public QUndoCommand
+{
+public:
+    removeThemeCommand(const QString &alias, QUndoCommand *parent = 0);
+    void undo();
+    void redo();
+
+private:
+    QString theme_title, theme_alias;
+};
+
+#endif // COMMAND_H
