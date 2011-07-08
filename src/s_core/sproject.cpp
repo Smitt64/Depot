@@ -22,10 +22,9 @@ bool SProject::create(const QString &filename) {
         return false;
     }
 
-    qDebug() << "File created";
-
     QDomDocument document("test");
     QDomElement test = document.createElement("test");
+    test.setAttribute("version", "depot1");
 
     QByteArray data;
     QTextStream stream(&data);
@@ -81,15 +80,19 @@ bool SProject::containsTheme(const QString &title) {
     return false;
 }
 
-bool SProject::addTheme(const QString &title) {
+bool SProject::addTheme(const QString &title, const QString &alias) {
     if(containsTheme(title))
         return false;
 
-    theme th;
-    th.name = title;
-    th.alias = QString("theme_%1")
-            .arg(++thmes_counter);
-    themes.insert(th.alias, &th);
+    thmes_counter ++;
+    theme *th = new theme;
+    th->name = title;
+    th->alias = (alias.isEmpty() ? QString("theme_%1")
+            .arg(thmes_counter) : alias);
+    if(themes.contains(th->alias))
+        return false;
+
+    themes.insert(th->alias, th);
 
     return true;
 }
@@ -100,11 +103,18 @@ QString SProject::themeAlias(const QString &title) {
             return themes.key(tm);
     }
 
-    return QString();
+    return QString::null;
+}
+
+QString SProject::themeTitle(const QString &alias) {
+    if(themes.contains(alias))
+        return themes[alias]->name;
+    return QString::null;
 }
 
 void SProject::removeTheme(const QString &alias) {
-    themes.remove(alias);
+    if(themes.contains(alias))
+        themes.remove(alias);
 }
 
 void SProject::decrimentTheme() {

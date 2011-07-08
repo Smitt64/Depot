@@ -35,8 +35,9 @@ public:
     QUndoStack *undoStack();
 
     bool containsTheme(const QString &title);
-    bool addTheme(const QString &title);
+    bool addTheme(const QString &title, const QString &alias = "");
     QString themeAlias(const QString &title);
+    QString themeTitle(const QString &alias);
     void removeTheme(const QString &alias);
     void decrimentTheme();
 
