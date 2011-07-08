@@ -3,13 +3,15 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QHeaderView>
 #include "sproject.h"
 #include "commands.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     CMainWindow(parent),
     commandsHistory(NULL),
-    tst_struct(NULL)
+    tst_struct(NULL),
+    theme_item(NULL)
 {
     setWindowTitle(tr("TestBuiler"));
     setDockOptions(QMainWindow::VerticalTabs);
@@ -22,7 +24,11 @@ MainWindow::MainWindow(QWidget *parent) :
     add_theme->setStatusTip(tr("Adding new theme to test..."));
     add_theme->setEnabled(false);
 
-    commandsHistory = new QUndoView;
+    QAction *rem_theme = addAction(tr("Remove theme"), "remove_theme", "theme", QIcon(":/removetheme"));
+    rem_theme->setStatusTip(tr("Removing current theme..."));
+    rem_theme->setEnabled(false);
+
+    commandsHistory = new QUndoView(S_PROJECT->undoStack());
     commandsHistory->setEmptyLabel(tr("<empty>"));
 
     QDockWidget *undoDock = addDockPanel(tr("Changes list"), "ch_list", QIcon(":/legend"));
@@ -33,7 +39,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QDockWidget *test_struct = addDockPanel(tr("Test struct"), "tst_struct", QIcon(":/book"));
     test_struct->setWidget(tst_struct);
     tst_struct->setEnabled(false);
-    tst_struct->setHeaderLabel(tr("Elements"));
+    tst_struct->setHeaderLabels(QStringList()
+                                << tr("Elements") << tr("Alias"));
+    tst_struct->header()->restoreState(SApplication::inst()->settings("window/tst_struct_header")
+                                       .toByteArray());
+    QHeaderView *hview = tst_struct->header();
+    hview->resizeSection(0, 140);
 
     QAction *create = action("new");
     QAction *close = action("close");
@@ -46,6 +57,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(close, SIGNAL(triggered()), this, SLOT(closeProject()));
 
     connect(add_theme, SIGNAL(triggered()), this, SLOT(addTheme()));
+
+    connect(S_PROJECT, SIGNAL(themeAdded(QString,QString)), this, SLOT(themeAdded(QString,QString)));
+    connect(S_PROJECT, SIGNAL(themeRemoved(QString)), this, SLOT(themeRemoved(QString)));
 }
 
 void MainWindow::createProject() {
@@ -77,9 +91,15 @@ void MainWindow::updateTestStruct() {
     top->setIcon(0, QIcon(":/book"));
     top->setText(0, tr("Test"));
     tst_struct->addTopLevelItem(top);
+
+    theme_item = new QTreeWidgetItem;
+    theme_item->setText(0, tr("Themes"));
+    theme_item->setIcon(0, QIcon(":/themegroup"));
+    top->addChild(theme_item);
 }
 
 void MainWindow::closeProject() {
+    SApplication::inst()->writeSettings("window/tst_struct_header", tst_struct->header()->saveState());
     tst_struct->clear();
     tst_struct->setEnabled(false);
     commandsHistory->setEnabled(false);
@@ -87,6 +107,7 @@ void MainWindow::closeProject() {
     action("undo")->setEnabled(false);
     action("redo")->setEnabled(false);
     action("add_theme")->setEnabled(false);
+    action("remove_theme")->setEnabled(false);
 }
 
 void MainWindow::addTheme() {
@@ -95,8 +116,26 @@ void MainWindow::addTheme() {
                                          tr("Enter caption for new theme:"),
                                           QLineEdit::Normal, "", &ok,
                                           Qt::Dialog | Qt::WindowTitleHint);
-    if(title.isEmpty() || S_PROJECT->containsTheme(title))
+    if(!ok || title.isEmpty() || S_PROJECT->containsTheme(title))
         return;
 
     S_PROJECT->undoStack()->push(new addThemeCommand(title));
+}
+
+void MainWindow::themeAdded(QString title, QString alias) {
+    QTreeWidgetItem *item = new QTreeWidgetItem;
+    item->setText(0, title);
+    item->setText(1, alias);
+    item->setIcon(0, QIcon(":/theme"));
+    theme_item->addChild(item);
+}
+
+void MainWindow::themeRemoved(QString alias) {
+    for(int i = 0; i < theme_item->childCount(); i++){
+        QTreeWidgetItem *item = theme_item->child(i);
+        if(item->text(1) == alias) {
+            delete item;
+            break;
+        }
+    }
 }

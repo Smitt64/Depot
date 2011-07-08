@@ -16,14 +16,16 @@ signals:
 private slots:
     void createProject();
     void closeProject();
-
     void addTheme();
+    void themeAdded(QString title, QString alias);
+    void themeRemoved(QString alias);
 
 private:
     void updateTestStruct();
     QUndoView *commandsHistory;
     QTreeWidget *tst_struct;
     QMenu *theme_mehu;
+    QTreeWidgetItem *theme_item;
 };
 
 #endif // MAINWINDOW_H
