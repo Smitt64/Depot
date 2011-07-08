@@ -157,6 +157,8 @@ void CMainWindow::makeEditMenu() {
 
     connect(S_PROJECT->undoStack(), SIGNAL(canUndoChanged(bool)), this, SLOT(canUndo(bool)));
     connect(S_PROJECT->undoStack(), SIGNAL(canRedoChanged(bool)), this, SLOT(canRedo(bool)));
+    connect(undo_action, SIGNAL(triggered()), S_PROJECT->undoStack(), SLOT(undo()));
+    connect(redo_action, SIGNAL(triggered()), S_PROJECT->undoStack(), SLOT(redo()));
 }
 
 void CMainWindow::makeViewMenu() {
