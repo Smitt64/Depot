@@ -13,5 +13,7 @@
         <file alias="redo">toolbar/Edit_RedoHS.png</file>
         <file alias="undo">toolbar/Edit_UndoHS.png</file>
         <file alias="addtheme">toolbar/add_theme.png</file>
+        <file alias="removetheme">toolbar/remove_theme.png</file>
+        <file alias="theme">toolbar/theme.png</file>
     </qresource>
 </RCC>
