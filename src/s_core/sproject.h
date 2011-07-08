@@ -42,6 +42,8 @@ public:
     void decrimentTheme();
 
 signals:
+    void themeAdded(QString title, QString alias);
+    void themeRemoved(QString alias);
 
 public slots:
 

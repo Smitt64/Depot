@@ -94,6 +94,8 @@ bool SProject::addTheme(const QString &title, const QString &alias) {
 
     themes.insert(th->alias, th);
 
+    emit themeAdded(th->name, th->alias);
+
     return true;
 }
 
@@ -114,7 +116,10 @@ QString SProject::themeTitle(const QString &alias) {
 
 void SProject::removeTheme(const QString &alias) {
     if(themes.contains(alias))
+    {
         themes.remove(alias);
+        emit themeRemoved(alias);
+    }
 }
 
 void SProject::decrimentTheme() {
