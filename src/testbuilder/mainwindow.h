@@ -18,6 +18,7 @@ private slots:
     void closeProject();
     void addTheme();
     void removeTheme();
+    void editTheme();
     void themeAdded(QString title, QString alias);
     void themeRemoved(QString alias);
     void tstSctructCurItemChanged(QTreeWidgetItem *cur, QTreeWidgetItem *prev);

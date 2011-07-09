@@ -6,6 +6,7 @@
 #include <QHeaderView>
 #include "sproject.h"
 #include "commands.h"
+#include "dialogs/edittheme.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     CMainWindow(parent),
@@ -27,6 +28,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QAction *rem_theme = addAction(tr("Remove theme"), "remove_theme", "theme", QIcon(":/removetheme"));
     rem_theme->setStatusTip(tr("Removing current theme..."));
     rem_theme->setEnabled(false);
+
+    QAction *edit_theme = addAction(tr("Edit theme"), "edit_theme", "theme");
+    edit_theme->setStatusTip(tr("Edeting current theme..."));
+    edit_theme->setEnabled(false);
 
     commandsHistory = new QUndoView(S_PROJECT->undoStack());
     commandsHistory->setEmptyLabel(tr("<empty>"));
@@ -58,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(add_theme, SIGNAL(triggered()), this, SLOT(addTheme()));
     connect(rem_theme, SIGNAL(triggered()), this, SLOT(removeTheme()));
+    connect(edit_theme, SIGNAL(triggered()), this, SLOT(editTheme()));
 
     connect(S_PROJECT, SIGNAL(themeAdded(QString,QString)), this, SLOT(themeAdded(QString,QString)));
     connect(S_PROJECT, SIGNAL(themeRemoved(QString)), this, SLOT(themeRemoved(QString)));
@@ -116,9 +122,11 @@ void MainWindow::closeProject() {
 void MainWindow::tstSctructCurItemChanged(QTreeWidgetItem *cur, QTreeWidgetItem *prev) {
     if(cur->data(0, Qt::UserRole).toString() == "theme") {
         action("remove_theme")->setEnabled(true);
+        action("edit_theme")->setEnabled(true);
     }
     else {
         action("remove_theme")->setEnabled(false);
+        action("edit_theme")->setEnabled(false);
     }
 }
 
@@ -144,6 +152,15 @@ void MainWindow::removeTheme() {
     S_PROJECT->undoStack()->push(new removeThemeCommand(tst_struct->currentItem()->text(1)));
 }
 
+void MainWindow::editTheme() {
+    EditThemeDlg *dlg = new EditThemeDlg(this);
+    dlg->setThemeTitleAlias(tst_struct->currentItem()->text(0), tst_struct->currentItem()->text(1));
+    if(dlg->exec() == QDialog::Rejected) {
+        SAFE_DELETE(dlg);
+        return;
+    }
+}
+
 void MainWindow::themeAdded(QString title, QString alias) {
     QTreeWidgetItem *item = new QTreeWidgetItem;
     item->setText(0, title);
@@ -164,3 +181,4 @@ void MainWindow::themeRemoved(QString alias) {
         }
     }
 }
+
