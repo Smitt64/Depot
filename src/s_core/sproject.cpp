@@ -84,7 +84,9 @@ bool SProject::addTheme(const QString &title, const QString &alias) {
     if(containsTheme(title))
         return false;
 
-    thmes_counter ++;
+    if(alias.isEmpty())
+        thmes_counter ++;
+
     theme *th = new theme;
     th->name = title;
     th->alias = (alias.isEmpty() ? QString("theme_%1")
