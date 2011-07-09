@@ -57,9 +57,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(close, SIGNAL(triggered()), this, SLOT(closeProject()));
 
     connect(add_theme, SIGNAL(triggered()), this, SLOT(addTheme()));
+    connect(rem_theme, SIGNAL(triggered()), this, SLOT(removeTheme()));
 
     connect(S_PROJECT, SIGNAL(themeAdded(QString,QString)), this, SLOT(themeAdded(QString,QString)));
     connect(S_PROJECT, SIGNAL(themeRemoved(QString)), this, SLOT(themeRemoved(QString)));
+    connect(tst_struct, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)),
+            this, SLOT(tstSctructCurItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)));
 }
 
 void MainWindow::createProject() {
@@ -110,6 +113,15 @@ void MainWindow::closeProject() {
     action("remove_theme")->setEnabled(false);
 }
 
+void MainWindow::tstSctructCurItemChanged(QTreeWidgetItem *cur, QTreeWidgetItem *prev) {
+    if(cur->data(0, Qt::UserRole).toString() == "theme") {
+        action("remove_theme")->setEnabled(true);
+    }
+    else {
+        action("remove_theme")->setEnabled(false);
+    }
+}
+
 void MainWindow::addTheme() {
     bool ok;
     QString title = QInputDialog::getText(this, tr("Addeting new theme..."),
@@ -122,11 +134,24 @@ void MainWindow::addTheme() {
     S_PROJECT->undoStack()->push(new addThemeCommand(title));
 }
 
+void MainWindow::removeTheme() {
+    if(QMessageBox::question(this, tr("Removing theme."),
+                          QString(tr("Are You really want remove theme ' %1 '?"))
+                          .arg(tst_struct->currentItem()->text(0)),
+                          QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No)
+        return;
+
+    S_PROJECT->undoStack()->push(new removeThemeCommand(tst_struct->currentItem()->text(1)));
+}
+
 void MainWindow::themeAdded(QString title, QString alias) {
     QTreeWidgetItem *item = new QTreeWidgetItem;
     item->setText(0, title);
     item->setText(1, alias);
     item->setIcon(0, QIcon(":/theme"));
+    item->setToolTip(0, QString(tr("<P><B>Theme: </B>%1</P><B>Alias: </B>%2"))
+                     .arg(title, alias));
+    item->setData(0, Qt::UserRole, "theme");
     theme_item->addChild(item);
 }
 
