@@ -155,6 +155,8 @@ void CMainWindow::makeEditMenu() {
     redo_action->setStatusTip(tr("Repeated performance of last action..."));
     redo_action->setEnabled(false);
 
+    editMenu->addSeparator();
+
     connect(S_PROJECT->undoStack(), SIGNAL(canUndoChanged(bool)), this, SLOT(canUndo(bool)));
     connect(S_PROJECT->undoStack(), SIGNAL(canRedoChanged(bool)), this, SLOT(canRedo(bool)));
     connect(undo_action, SIGNAL(triggered()), S_PROJECT->undoStack(), SLOT(undo()));

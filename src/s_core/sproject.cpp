@@ -4,13 +4,36 @@
 SProject::SProject(QObject *parent) :
     QObject(parent),
     file_handle(NULL),
-    thmes_counter(0)
+    thmes_counter(0),
+    res_counter(0)
 {
+    temp_handle = new FSHANDLE;
     undo_stack = new QUndoStack(this);
+    quest_model = new QuestionsModel;
+    quest_types = new QStandardItemModel;
+
+    quest_types->setColumnCount(3);
+    quest_types->setHeaderData(0, Qt::Horizontal, tr("Type caption"));
+    quest_types->setHeaderData(1, Qt::Horizontal, tr("Name"));
+    quest_types->setHeaderData(2, Qt::Horizontal, tr("Plugin"));
+
+    quest_types->insertRow(0);
+    quest_types->setData(quest_types->index(0, 0), tr("Question with variants of answers"));
+    quest_types->setData(quest_types->index(0, 1), "closed_question");
+    quest_types->setData(quest_types->index(0, 2), "default");
+
+    quest_types->insertRow(1);
+    quest_types->setData(quest_types->index(1, 0), tr("Free choice"));
+    quest_types->setData(quest_types->index(1, 1), "opened_question");
+    quest_types->setData(quest_types->index(1, 2), "default");
 }
 
 void SProject::setRedactorMode(bool value) {
     redactor_mode = value;
+}
+
+bool SProject::isRedactorMode() {
+    return redactor_mode;
 }
 
 bool SProject::create(const QString &filename) {
@@ -45,8 +68,20 @@ bool SProject::openProject(const QString &filename) {
 QByteArray SProject::readData(const QString &filename) {
     if(!FileSystem::getInst()->fsOpen(file_handle))
         return QByteArray();
-    if(!FileSystem::getInst()->fsHasFile(filename, file_handle))
-        return QByteArray();
+    if(!FileSystem::getInst()->fsHasFile(filename, file_handle)) {
+        FileSystem::getInst()->fsClose(file_handle);
+        if(!redactor_mode && !FileSystem::getInst()->fsOpen(temp_handle))
+            return QByteArray();
+
+        if(!FileSystem::getInst()->fsHasFile(filename, temp_handle)) {
+            FileSystem::getInst()->fsClose(temp_handle);
+            return QByteArray();
+        }
+
+        QByteArray data = FileSystem::getInst()->fsGetFile(filename, temp_handle);
+        FileSystem::getInst()->fsClose(temp_handle);
+        return data;
+    }
 
     QByteArray data = FileSystem::getInst()->fsGetFile(filename, file_handle);
     FileSystem::getInst()->fsClose(file_handle);
@@ -55,11 +90,11 @@ QByteArray SProject::readData(const QString &filename) {
 }
 
 bool SProject::addData(QByteArray s_data, const QString &filename) {
-    if(!FileSystem::getInst()->fsOpen(file_handle))
+    if(!FileSystem::getInst()->fsOpen(temp_handle))
         return false;
 
-    bool hr = FileSystem::getInst()->fsAddFile(s_data, filename, file_handle);
-    FileSystem::getInst()->fsClose(file_handle);
+    bool hr = FileSystem::getInst()->fsAddFile(s_data, filename, temp_handle);
+    FileSystem::getInst()->fsClose(temp_handle);
     return hr;
 }
 
@@ -126,4 +161,16 @@ void SProject::removeTheme(const QString &alias) {
 
 void SProject::decrimentTheme() {
     thmes_counter --;
+}
+
+QuestionsModel *SProject::questions() {
+    return quest_model;
+}
+
+QStandardItemModel *SProject::questTypes() {
+    return quest_types;
+}
+
+int *SProject::resourceCounter() {
+    return (int*)&res_counter;
 }

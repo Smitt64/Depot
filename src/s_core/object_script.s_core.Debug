@@ -1,0 +1,14 @@
+INPUT(
+./.build\sapplication.o
+./.build\cmainwindow.o
+./.build\filesystem.o
+./.build\sproject.o
+./.build\commands.o
+./.build\questionsmodel.o
+./.build\s_texteditwidget.o
+./.build\moc_cmainwindow.o
+./.build\moc_sproject.o
+./.build\moc_questionsmodel.o
+./.build\moc_s_texteditwidget.o
+./.build\qrc_s_core_res.o
+);

@@ -1,5 +1,9 @@
 #include "edittheme.h"
+#include "sapplication.h"
+#include "questionsmodel.h"
+#include "sproject.h"
 #include <QFormLayout>
+#include <QStandardItemModel>
 
 EditThemeDlg::EditThemeDlg(QWidget *parent) :
     QDialog(parent)
@@ -17,6 +21,7 @@ EditThemeDlg::EditThemeDlg(QWidget *parent) :
     line->setFrameShadow(QFrame::Sunken);
 
     quests = new QListView;
+    quests->setSelectionMode(QAbstractItemView::MultiSelection);
     quests->setWhatsThis(tr("The list of all questions in the test."
                             "The allocated questions will be added in a theme."));
 
@@ -28,7 +33,7 @@ EditThemeDlg::EditThemeDlg(QWidget *parent) :
     cancel = buttons->addButton(tr("Cancel"), QDialogButtonBox::RejectRole);
     cancel->setWhatsThis(tr("Discard all changes."));
 
-    QFormLayout *form = new QFormLayout;
+    form = new QFormLayout;
     form->addRow(tr("Theme caption: "), theme_caption);
     form->addRow(tr("Theme alias: "), theme_alias);
     form->setWidget(2, QFormLayout::SpanningRole, line);
@@ -37,10 +42,21 @@ EditThemeDlg::EditThemeDlg(QWidget *parent) :
 
     setLayout(form);
 
+    quests->setModel(S_PROJECT->questions());
+
     connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
     connect(theme_caption, SIGNAL(textChanged(QString)), this, SLOT(captionChanged(QString)));
     connect(theme_alias, SIGNAL(textChanged(QString)), this, SLOT(captionChanged(QString)));
+}
+
+EditThemeDlg::~EditThemeDlg() {
+    SAFE_DELETE(form);
+    SAFE_DELETE(theme_caption);
+    SAFE_DELETE(theme_alias);
+    SAFE_DELETE(line);
+    SAFE_DELETE(quests);
+    SAFE_DELETE(buttons);
 }
 
 void EditThemeDlg::setThemeTitleAlias(const QString &title, const QString &alias) {
@@ -52,7 +68,8 @@ void EditThemeDlg::setThemeTitleAlias(const QString &title, const QString &alias
 }
 
 void EditThemeDlg::captionChanged(const QString &text) {
-    if(theme_caption->text() != old_title || theme_alias->text() != old_alias)
+    if((theme_caption->text() != old_title || theme_alias->text() != old_alias) &&
+            theme_caption->text().length() > 0 && theme_alias->text().length() > 0)
         save_changes->setEnabled(true);
     else
         save_changes->setEnabled(false);

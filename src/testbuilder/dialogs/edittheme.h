@@ -5,6 +5,7 @@
 #include <QDialogButtonBox>
 #include <QLineEdit>
 #include <QListView>
+#include <QFormLayout>
 #include <QPushButton>
 
 class EditThemeDlg : public QDialog
@@ -12,6 +13,7 @@ class EditThemeDlg : public QDialog
     Q_OBJECT
 public:
     EditThemeDlg(QWidget *parent = 0);
+    ~EditThemeDlg();
 
     void setThemeTitleAlias(const QString &title, const QString &alias);
     bool isTitleChanged();
@@ -27,6 +29,7 @@ private:
     QDialogButtonBox  *buttons;
     QPushButton *save_changes;
     QPushButton *cancel;
+    QFormLayout *form;
 
     QString old_title, old_alias;
 };

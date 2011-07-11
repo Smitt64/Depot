@@ -3,8 +3,10 @@
 
 #include <QObject>
 #include <QUndoStack>
+#include <QStandardItemModel>
 #include "sapplication.h"
 #include "commands.h"
+#include "questionsmodel.h"
 
 #define S_PROJECT ((SProject*)(SApplication::inst()->project()))
 
@@ -21,9 +23,11 @@ typedef struct {
 class SProject : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool in_redactor_mode READ isRedactorMode WRITE setRedactorMode)
 public:
     explicit SProject(QObject *parent = 0);
 
+    bool isRedactorMode();
     void setRedactorMode(bool value);
 
     bool create(const QString &filename);
@@ -41,6 +45,11 @@ public:
     void removeTheme(const QString &alias);
     void decrimentTheme();
 
+    int *resourceCounter();
+
+    QuestionsModel *questions();
+    QStandardItemModel *questTypes();
+
 signals:
     void themeAdded(QString title, QString alias);
     void themeRemoved(QString alias);
@@ -49,12 +58,13 @@ public slots:
 
 private:
     bool redactor_mode;
-    FSHANDLE *file_handle;
+    FSHANDLE *file_handle, *temp_handle;
     QUndoStack *undo_stack;
     QMap<QString, theme*> themes;
-    QMap<QString, question*> questions;
-
-    int thmes_counter;
+    //QMap<QString, question*> questions;
+    QuestionsModel *quest_model;
+    QStandardItemModel *quest_types;
+    int thmes_counter, res_counter;
 };
 
 #endif // SPROJECT_H

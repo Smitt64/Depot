@@ -14,13 +14,17 @@ HEADERS = sapplication.h \
           cmainwindow.h \
           filesystem.h \
     sproject.h \
-    commands.h
+    commands.h \
+    questionsmodel.h \
+    s_texteditwidget.h
 
 SOURCES = sapplication.cpp \
           cmainwindow.cpp \
           filesystem.cpp \
     sproject.cpp \
-    commands.cpp
+    commands.cpp \
+    questionsmodel.cpp \
+    s_texteditwidget.cpp
 
 RESOURCES += \
     ../../res/s_core_res.qrc

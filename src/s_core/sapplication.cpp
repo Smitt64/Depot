@@ -14,7 +14,6 @@ SApplication::SApplication(int argc, char **args) :
     QSettings set;
 
     resource = new FSHANDLE;
-    s_project = new SProject;
 
     s_App = this;
 }
@@ -65,5 +64,8 @@ void SApplication::installTranslator(QTranslator *translator) {
 }
 
 QObject *SApplication::project() {
+    if(!s_project)
+        s_project = new SProject;
+
     return (QObject*)s_project;
 }
