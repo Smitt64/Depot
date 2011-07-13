@@ -33,7 +33,11 @@ SCustomizeDlg::SCustomizeDlg(QWidget *parent) :
     tab1_layout->addWidget(actions);
     page1->setLayout(tab1_layout);
 
+    //Tab2 - Commands
+    QWidget *page2 = new QWidget;
+
     tab->addTab(page1, tr("Toolbars"));
+    tab->addTab(page2, tr("Commands"));
 
     QStringList keys = MAIN(parent)->toolBars.keys();
     for(int i = 0; i < keys.count(); i++) {

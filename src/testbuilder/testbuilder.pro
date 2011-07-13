@@ -14,10 +14,12 @@ debug: DESTDIR = ../../bin/debug
 
 SOURCES = main.cpp \
     mainwindow.cpp \
-    dialogs/edittheme.cpp
+    dialogs/edittheme.cpp \
+    dialogs/editquestion.cpp
 
 HEADERS += \
     mainwindow.h \
-    dialogs/edittheme.h
+    dialogs/edittheme.h \
+    dialogs/editquestion.h
 
 debug:LIBS += ../../bin/debug/libs_core.a

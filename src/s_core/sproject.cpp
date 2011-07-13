@@ -1,5 +1,7 @@
 ﻿#include "sproject.h"
 #include <QDomDocument>
+#include <QDir>
+#include <QFileInfo>
 
 SProject::SProject(QObject *parent) :
     QObject(parent),
@@ -44,6 +46,10 @@ bool SProject::create(const QString &filename) {
         FileSystem::getInst()->fsClose(file_handle);
         return false;
     }
+    FileSystem::getInst()->fsClose(file_handle);
+
+    temp_handle->archFName = QString("%1/%2").arg(QDir::tempPath(), QFileInfo(filename).fileName());
+    FileSystem::getInst()->fsCreate(temp_handle->archFName, temp_handle);
 
     QDomDocument document("test");
     QDomElement test = document.createElement("test");

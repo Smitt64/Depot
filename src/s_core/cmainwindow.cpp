@@ -1,8 +1,9 @@
 ﻿#include "cmainwindow.h"
 #include "sapplication.h"
+#include "sproject.h"
+#include "scustomizedlg.h"
 #include <QtGui>
 #include <QTreeWidget>
-#include "sproject.h"
 
 CMainWindow::CMainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -261,4 +262,18 @@ void CMainWindow::canUndo(bool value) {
 
 void CMainWindow::canRedo(bool value) {
     actions["redo"]->setEnabled(value);
+}
+
+void CMainWindow::makeServiceMenu() {
+    QMenu *service_menu = addMenu(tr("Service"), "service_menu");
+
+    QAction *customize = addAction(tr("Customize"), "custom_action", "service_menu");
+
+    connect(customize, SIGNAL(triggered()), this, SLOT(tool_customize()));
+}
+
+void CMainWindow::tool_customize() {
+    SCustomizeDlg *dlg = new SCustomizeDlg(this);
+
+    dlg->exec();
 }

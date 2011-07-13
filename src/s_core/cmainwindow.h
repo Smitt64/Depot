@@ -17,6 +17,8 @@ class QToolBar;
 
 class CMainWindow : public QMainWindow {
     Q_OBJECT
+
+    friend class SCustomizeDlg;
 public:
     CMainWindow(QWidget *parent = 0);
     virtual ~CMainWindow();
@@ -30,6 +32,7 @@ public:
     void makeFileMenu(const bool &withToolBar = true);
     void makeEditMenu();
     void makeViewMenu();
+    void makeServiceMenu();
     void setWindowFilePath(const QString &filePath);
 
     QAction *action(const QString &title);
@@ -41,6 +44,7 @@ private slots:
     void dockVisiblseChanged(bool value);
     void canUndo(bool value);
     void canRedo(bool value);
+    void tool_customize();
 
 private:
     QMap<QString, QToolBar*> toolBars;

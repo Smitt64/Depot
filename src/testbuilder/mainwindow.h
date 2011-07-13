@@ -23,11 +23,13 @@ private slots:
     void themeRemoved(QString alias);
     void tstSctructCurItemChanged(QTreeWidgetItem *cur, QTreeWidgetItem *prev);
 
+    void addQuestion();
+
 private:
     void updateTestStruct();
     QUndoView *commandsHistory;
     QTreeWidget *tst_struct;
-    QMenu *theme_mehu;
+    QMenu *theme_mehu, *quest_menu;
     QTreeWidgetItem *theme_item;
 };
 

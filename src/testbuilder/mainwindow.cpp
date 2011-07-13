@@ -4,8 +4,11 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QHeaderView>
+#include <QTableView>
 #include "sproject.h"
 #include "commands.h"
+#include "questionsmodel.h"
+#include "dialogs/editquestion.h"
 #include "dialogs/edittheme.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -14,6 +17,10 @@ MainWindow::MainWindow(QWidget *parent) :
     tst_struct(NULL),
     theme_item(NULL)
 {
+    QTableView *view = new QTableView;
+    //view->setModel(new QuestionsModel);
+    view->setModel(S_PROJECT->questTypes());
+    setCentralWidget(view);
     setWindowTitle(tr("TestBuiler"));
     setDockOptions(QMainWindow::VerticalTabs);
     makeFileMenu();
@@ -33,6 +40,15 @@ MainWindow::MainWindow(QWidget *parent) :
     edit_theme->setStatusTip(tr("Edeting current theme..."));
     edit_theme->setEnabled(false);
 
+    quest_menu = addMenu(tr("Question"), "quest_menu");
+    QAction *add_quest = addAction(tr("Add question"), "add_quest", "quest_menu");
+    add_quest->setStatusTip(tr("Adding new question..."));
+    add_quest->setEnabled(false);
+
+    QAction *rem_quest = addAction(tr("Remove question"), "rem_quest", "quest_menu");
+    rem_quest->setStatusTip(tr("Removing current question..."));
+    rem_quest->setEnabled(false);
+
     commandsHistory = new QUndoView(S_PROJECT->undoStack());
     commandsHistory->setEmptyLabel(tr("<empty>"));
 
@@ -42,6 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     tst_struct = new QTreeWidget;
     QDockWidget *test_struct = addDockPanel(tr("Test struct"), "tst_struct", QIcon(":/book"));
+
     test_struct->setWidget(tst_struct);
     tst_struct->setEnabled(false);
     tst_struct->setHeaderLabels(QStringList()
@@ -56,6 +73,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     close->setEnabled(false);
 
+    makeServiceMenu();
+
     restore();
 
     connect(create, SIGNAL(triggered()), this, SLOT(createProject()));
@@ -64,6 +83,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(add_theme, SIGNAL(triggered()), this, SLOT(addTheme()));
     connect(rem_theme, SIGNAL(triggered()), this, SLOT(removeTheme()));
     connect(edit_theme, SIGNAL(triggered()), this, SLOT(editTheme()));
+
+    connect(add_quest, SIGNAL(triggered()), this, SLOT(addQuestion()));
 
     connect(S_PROJECT, SIGNAL(themeAdded(QString,QString)), this, SLOT(themeAdded(QString,QString)));
     connect(S_PROJECT, SIGNAL(themeRemoved(QString)), this, SLOT(themeRemoved(QString)));
@@ -91,6 +112,7 @@ void MainWindow::createProject() {
     tst_struct->setEnabled(true);
     action("close")->setEnabled(true);
     action("add_theme")->setEnabled(true);
+    action("add_quest")->setEnabled(true);
 
     updateTestStruct();
 }
@@ -117,6 +139,7 @@ void MainWindow::closeProject() {
     action("redo")->setEnabled(false);
     action("add_theme")->setEnabled(false);
     action("remove_theme")->setEnabled(false);
+    action("add_quest")->setEnabled(false);
 }
 
 void MainWindow::tstSctructCurItemChanged(QTreeWidgetItem *cur, QTreeWidgetItem *prev) {
@@ -182,3 +205,8 @@ void MainWindow::themeRemoved(QString alias) {
     }
 }
 
+void MainWindow::addQuestion() {
+    EditQuestionDlg *dlg = new EditQuestionDlg(this);
+
+    dlg->exec();
+}
