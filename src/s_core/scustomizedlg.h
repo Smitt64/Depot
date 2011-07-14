@@ -8,6 +8,7 @@
 #include <QBoxLayout>
 #include <QPushButton>
 #include <QDialogButtonBox>
+#include <QStylePainter>
 #include "cmainwindow.h"
 #include "stoolbar.h"
 
@@ -28,6 +29,7 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event);
 };
 
+
 class SCustomizeDlg : public QDialog
 {
     Q_OBJECT
@@ -37,6 +39,7 @@ public:
 
 private slots:
     void addUserToolBar();
+    void onClickActionItem(QListWidgetItem *item);
 
 private:
     QDialogButtonBox *buttons, *actions;

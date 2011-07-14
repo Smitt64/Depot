@@ -3,6 +3,8 @@
 #include "sapplication.h"
 #include <QDebug>
 #include <QMdiArea>
+#include <QInputDialog>
+#include <QPainter>
 
 #define MAIN(x) (((CMainWindow*)(x)))
 
@@ -38,9 +40,6 @@ void SActionListWidget::mousePressEvent(QMouseEvent *event) {
         return;
 
     QByteArray data = item->data(Qt::UserRole).toByteArray();
-    //QDataStream dataStream(&data, QIODevice::WriteOnly);
-    //dataStream << item->data(Qt::UserRole);
-    //qDebug() << "Text: " << item->text() << ;
 
     QMimeData *mimeData = new QMimeData;
     mimeData->setData("actions/x-actiondata", data);
@@ -77,6 +76,7 @@ SCustomizeDlg::SCustomizeDlg(QWidget *parent) :
     create_toolbar = actions->addButton(tr("New"), QDialogButtonBox::ActionRole);
     create_toolbar->setWhatsThis(tr("Creating new user toolbar."));
     remove_toolbar = actions->addButton(tr("Remove"), QDialogButtonBox::ActionRole);
+    remove_toolbar->setEnabled(false);
     remove_toolbar->setWhatsThis(tr("Removing toolbar."));
 
     buttons->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -119,6 +119,9 @@ SCustomizeDlg::SCustomizeDlg(QWidget *parent) :
 
         tool_list->addItem(item);
     }
+
+    connect(create_toolbar, SIGNAL(clicked()), this, SLOT(addUserToolBar()));
+    connect(tool_list, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(onClickActionItem(QListWidgetItem*)));
 }
 
 SCustomizeDlg::~SCustomizeDlg() {
@@ -126,5 +129,22 @@ SCustomizeDlg::~SCustomizeDlg() {
 }
 
 void SCustomizeDlg::addUserToolBar() {
+    bool ok = false;
+    QString text = QInputDialog::getText(this, tr("New toolbar"),
+                                         tr("Enter neme for new toolbar:"),
+                                         QLineEdit::Normal, "", &ok);
 
+    if(!ok || text.isEmpty())
+        return;
+}
+
+void SCustomizeDlg::onClickActionItem(QListWidgetItem *item) {
+    if(MAIN(parent())->toolBars[item->data(Qt::UserRole).toString()]->isUser() == false) {
+        remove_toolbar->setEnabled(false);
+        tab->widget(1)->setEnabled(false);
+    }
+    else {
+        remove_toolbar->setEnabled(true);
+        tab->widget(1)->setEnabled(true);
+    }
 }
