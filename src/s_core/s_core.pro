@@ -18,7 +18,8 @@ HEADERS = sapplication.h \
     questionsmodel.h \
     s_texteditwidget.h \
     stexteditor.h \
-    scustomizedlg.h
+    scustomizedlg.h \
+    stoolbar.h
 
 SOURCES = sapplication.cpp \
           cmainwindow.cpp \
@@ -28,7 +29,8 @@ SOURCES = sapplication.cpp \
     questionsmodel.cpp \
     s_texteditwidget.cpp \
     stexteditor.cpp \
-    scustomizedlg.cpp
+    scustomizedlg.cpp \
+    stoolbar.cpp
 
 RESOURCES += \
     ../../res/s_core_res.qrc

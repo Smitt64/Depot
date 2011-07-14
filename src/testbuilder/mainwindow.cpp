@@ -18,7 +18,6 @@ MainWindow::MainWindow(QWidget *parent) :
     theme_item(NULL)
 {
     QTableView *view = new QTableView;
-    //view->setModel(new QuestionsModel);
     view->setModel(S_PROJECT->questTypes());
     setCentralWidget(view);
     setWindowTitle(tr("TestBuiler"));

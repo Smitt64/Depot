@@ -28,6 +28,7 @@ public:
     void restore();
 
     SToolBar *addToolBar(const QString &title, const QString &name);
+    SToolBar *addToolBar(SToolBar *bar);
     QMenu *addMenu(const QString &title, const QString &name, const QIcon &icon = QIcon(), const QString &menu = "");
     QAction *addAction(const QString &title, const QString &name, const QString &menu = "", const QIcon &icon = QIcon());
     QAction *addAction(QAction *action, const QString &name, const QString &menu = "");

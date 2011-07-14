@@ -45,6 +45,13 @@ SToolBar *CMainWindow::addToolBar(const QString &title,
     return toolBars.value(name);
 }
 
+SToolBar *CMainWindow::addToolBar(SToolBar *bar) {
+    QMainWindow::addToolBar((QToolBar*)bar);
+    toolBars.insert(bar->objectName(), bar);
+
+    return toolBars.value(bar->objectName());
+}
+
 QMenu *CMainWindow::addMenu(const QString &title,
                             const QString &name,
                             const QIcon &icon,
@@ -235,8 +242,8 @@ void CMainWindow::dockVisiblseChanged(bool value) {
 }
 
 void CMainWindow::closeEvent(QCloseEvent *event) {
-    SApplication::inst()->writeSettings("window/geometry", saveGeometry());
     SApplication::inst()->writeSettings("window/state", saveState());
+    SApplication::inst()->writeSettings("window/geometry", saveGeometry());
 }
 
 void CMainWindow::setWindowFilePath(const QString &filePath) {
