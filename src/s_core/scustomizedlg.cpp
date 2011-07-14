@@ -1,7 +1,68 @@
 #include "scustomizedlg.h"
 #include "cmainwindow.h"
+#include "sapplication.h"
+#include <QDebug>
+#include <QMdiArea>
 
 #define MAIN(x) (((CMainWindow*)(x)))
+
+SActionListWidget::SActionListWidget(QWidget *parent) :
+    QListWidget(parent)
+{
+}
+
+SActionListWidget::~SActionListWidget()
+{
+
+}
+
+void SActionListWidget::setActionList(QList<QAction*> actions) {
+    s_actions = actions;
+    for(int i = 0; i < actions.count(); i++) {
+        QListWidgetItem *item = new QListWidgetItem;
+        item->setText(actions[i]->text());
+        item->setData(Qt::UserRole, actions[i]->data());
+        item->setIcon(actions[i]->icon());
+        item->setToolTip(actions[i]->statusTip());
+
+        addItem(item);
+    }
+
+    sortItems();
+}
+
+void SActionListWidget::mousePressEvent(QMouseEvent *event) {
+    QListWidgetItem *item = static_cast<QListWidgetItem*>(itemAt(event->pos()));
+
+    if(!item)
+        return;
+
+    QByteArray data = item->data(Qt::UserRole).toByteArray();
+    //QDataStream dataStream(&data, QIODevice::WriteOnly);
+    //dataStream << item->data(Qt::UserRole);
+    //qDebug() << "Text: " << item->text() << ;
+
+    QMimeData *mimeData = new QMimeData;
+    mimeData->setData("actions/x-actiondata", data);
+
+    QDrag *drag = new QDrag(this);
+    drag->setMimeData(mimeData);
+    QPixmap map = item->icon().pixmap(64, 64, QIcon::Normal, QIcon::On);
+    drag->setPixmap(map);
+    drag->setHotSpot(QPoint(map.width() / 2, map.height() / 2));
+
+    if(drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction) == Qt::MoveAction) {
+
+    }
+}
+
+void SActionListWidget::dragEnterEvent(QDragEnterEvent *event) {
+    if(event->mimeData()->hasFormat("application/x-dnditemdata")) {
+
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
 
 SCustomizeDlg::SCustomizeDlg(QWidget *parent) :
     QDialog(parent)
@@ -35,6 +96,16 @@ SCustomizeDlg::SCustomizeDlg(QWidget *parent) :
 
     //Tab2 - Commands
     QWidget *page2 = new QWidget;
+    tab2_layout = new QVBoxLayout;
+    wnd = new CMainWindow;
+    test_bar = wnd->addToolBar("test", "test");
+    test_bar->setActions(MAIN(parent)->actionList());
+    action_list = new SActionListWidget;
+    action_list->setActionList(MAIN(parent)->actionList());
+
+    tab2_layout->addWidget(action_list);
+    tab2_layout->addWidget(wnd);
+    page2->setLayout(tab2_layout);
 
     tab->addTab(page1, tr("Toolbars"));
     tab->addTab(page2, tr("Commands"));
@@ -48,4 +119,12 @@ SCustomizeDlg::SCustomizeDlg(QWidget *parent) :
 
         tool_list->addItem(item);
     }
+}
+
+SCustomizeDlg::~SCustomizeDlg() {
+    SAFE_DELETE(layout);
+}
+
+void SCustomizeDlg::addUserToolBar() {
+
 }

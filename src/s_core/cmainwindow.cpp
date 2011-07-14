@@ -22,20 +22,24 @@ CMainWindow::~CMainWindow() {
     SAFE_DELETE(fileMenu);
     toolBars.clear();
     menus.clear();
-    actions.clear();
+    sactions.clear();
 }
 
 void CMainWindow::restore() {
     restoreState(SApplication::inst()->settings("window/state").toByteArray());
     restoreGeometry(SApplication::inst()->settings("window/geometry").toByteArray());
 
-    if(actions.contains("fullscreen"))
-        actions["fullscreen"]->setChecked(isFullScreen());
+    if(sactions.contains("fullscreen"))
+        sactions["fullscreen"]->setChecked(isFullScreen());
 }
 
-QToolBar *CMainWindow::addToolBar(const QString &title,
+SToolBar *CMainWindow::addToolBar(const QString &title,
                                   const QString &name) {
-    toolBars.insert(name, QMainWindow::addToolBar(title));
+    SToolBar *bar = new SToolBar;
+    bar->setWindowTitle(title);
+    bar->setObjectName(name);
+    QMainWindow::addToolBar((QToolBar*)bar);
+    toolBars.insert(name, bar);
     toolBars[name]->setIconSize(SApplication::inst()->settings("interface/tb_iconsize",
                                                                 QSize(16, 16)).toSize());
     return toolBars.value(name);
@@ -59,25 +63,35 @@ QAction *CMainWindow::addAction(const QString &title,
                                 const QString &name,
                                 const QString &menu,
                                 const QIcon &icon) {
+    if(sactions.contains(name))
+        return NULL;
+
     if(menus.contains(menu)) {
-        actions.insert(name, (icon.isNull() ?  menus[menu]->addAction(title) :
+        sactions.insert(name, (icon.isNull() ?  menus[menu]->addAction(title) :
                                                 menus[menu]->addAction(icon, title)));
-        return actions.value(name);
+        sactions.value(name)->setData(name);
+        return sactions.value(name);
     }
     else {
-       return menuBar()->addAction(name);
+       sactions.insert(name, menuBar()->addAction(title));
+       sactions.value(name)->setData(name);
+       return sactions[name];
     }
 }
 
 QAction *CMainWindow::addAction(QAction *action,
                                 const QString &name,
                                 const QString &menu) {
+    if(sactions.contains(name))
+        return NULL;
+
     if(menus.contains(menu))
         menus[menu]->addAction(action);
     else
         menuBar()->addAction(action);
-    actions.insert(name, action);
-    return action;
+    sactions.insert(name, action);
+    sactions[name]->setData(name);
+    return sactions[name];
 }
 
 QDockWidget *CMainWindow::addDockPanel(const QString &title, const QString &name, const QIcon &icon)
@@ -168,7 +182,7 @@ void CMainWindow::makeViewMenu() {
     viewMenu = addMenu(tr("View"), "View");
 
     QAction *action;
-    foreach (QToolBar *bar, toolBars) {
+    foreach (SToolBar *bar, toolBars) {
         action = addAction(bar->windowTitle(), bar->windowTitle(), "View");
         action->setData(toolBars.key(bar));
         action->setCheckable(true);
@@ -180,14 +194,14 @@ void CMainWindow::makeViewMenu() {
         connect(action, SIGNAL(triggered(bool)), this, SLOT(checkToolBars(bool)));
     }
     addAction(tr("Status bar"), "sb", "View");
-    actions["sb"]->setCheckable(true);
-    actions["sb"]->setStatusTip(tr("Show/hide status bar..."));
-    actions["sb"]->setChecked(SApplication::inst()->settings("view/status_bar", true).toBool());
+    sactions["sb"]->setCheckable(true);
+    sactions["sb"]->setStatusTip(tr("Show/hide status bar..."));
+    sactions["sb"]->setChecked(SApplication::inst()->settings("view/status_bar", true).toBool());
     if(!statusBar()) {
         setStatusBar(new QStatusBar);
     }
-    statusBar()->setVisible(actions["sb"]->isChecked());
-    connect(actions["sb"], SIGNAL(triggered(bool)), this, SLOT(checkStatusBar(bool)));
+    statusBar()->setVisible(sactions["sb"]->isChecked());
+    connect(sactions["sb"], SIGNAL(triggered(bool)), this, SLOT(checkStatusBar(bool)));
 
     menus["View"]->addSeparator();
     QAction *fullscrAction = addAction(tr("Full screen"), "fullscreen", "View", QIcon(":/fullscreen"));
@@ -216,7 +230,7 @@ void CMainWindow::checkStatusBar(bool value) {
 
 void CMainWindow::dockVisiblseChanged(bool value) {
     QAction *dock = (QAction*)sender();
-    QString key = actions.key(dock);
+    QString key = sactions.key(dock);
     SApplication::inst()->writeSettings(key, value);
 }
 
@@ -243,8 +257,8 @@ void CMainWindow::setWindowFilePath(const QString &filePath) {
 }
 
 QAction *CMainWindow::action(const QString &title) {
-    if(actions.contains(title)) {
-        return actions[title];
+    if(sactions.contains(title)) {
+        return sactions[title];
     }
     return new QAction(NULL);
 }
@@ -257,11 +271,11 @@ void CMainWindow::fullscreen(bool value) {
 }
 
 void CMainWindow::canUndo(bool value) {
-    actions["undo"]->setEnabled(value);
+    sactions["undo"]->setEnabled(value);
 }
 
 void CMainWindow::canRedo(bool value) {
-    actions["redo"]->setEnabled(value);
+    sactions["redo"]->setEnabled(value);
 }
 
 void CMainWindow::makeServiceMenu() {
@@ -270,6 +284,16 @@ void CMainWindow::makeServiceMenu() {
     QAction *customize = addAction(tr("Customize"), "custom_action", "service_menu");
 
     connect(customize, SIGNAL(triggered()), this, SLOT(tool_customize()));
+}
+
+QList<QAction*> CMainWindow::actionList() {
+    QList<QAction*> list;
+    QStringList ac = sactions.keys();
+
+    for(int i = 0; i < ac.count(); i++) {
+        list.append(sactions[ac[i]]);
+    }
+    return list;
 }
 
 void CMainWindow::tool_customize() {

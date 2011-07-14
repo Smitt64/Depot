@@ -12,19 +12,22 @@
 #include <QRect>
 #include <QDockWidget>
 #include "sproject.h"
+#include "stoolbar.h"
 
 class QToolBar;
 
 class CMainWindow : public QMainWindow {
     Q_OBJECT
 
+    friend class SToolBar;
     friend class SCustomizeDlg;
+    friend class SActionListWidget;
 public:
     CMainWindow(QWidget *parent = 0);
     virtual ~CMainWindow();
     void restore();
 
-    QToolBar *addToolBar(const QString &title, const QString &name);
+    SToolBar *addToolBar(const QString &title, const QString &name);
     QMenu *addMenu(const QString &title, const QString &name, const QIcon &icon = QIcon(), const QString &menu = "");
     QAction *addAction(const QString &title, const QString &name, const QString &menu = "", const QIcon &icon = QIcon());
     QAction *addAction(QAction *action, const QString &name, const QString &menu = "");
@@ -36,6 +39,7 @@ public:
     void setWindowFilePath(const QString &filePath);
 
     QAction *action(const QString &title);
+    QList<QAction*> actionList();
 
 private slots:
     void checkToolBars(bool value);
@@ -47,8 +51,8 @@ private slots:
     void tool_customize();
 
 private:
-    QMap<QString, QToolBar*> toolBars;
-    QMap<QString, QAction*> actions;
+    QMap<QString, SToolBar*> toolBars;
+    QMap<QString, QAction*> sactions;
     QMap<QString, QMenu*> menus;
     QMap<QString, QDockWidget*> docks;
     QMenu *fileMenu, *editMenu,*viewMenu;
