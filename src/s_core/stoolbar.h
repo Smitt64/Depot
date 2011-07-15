@@ -22,9 +22,11 @@ private:
     bool isUserToolBar;
 
 protected:
+    virtual void paintEvent(QPaintEvent *event);
     virtual void dropEvent(QDropEvent *event);
     virtual void dragMoveEvent(QDragMoveEvent *event);
     virtual void dragEnterEvent(QDragEnterEvent *event);
+    virtual bool event(QEvent *event);
 };
 
 #endif // STOOLBAR_H

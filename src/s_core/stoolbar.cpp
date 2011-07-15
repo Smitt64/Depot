@@ -1,6 +1,10 @@
 #include "stoolbar.h"
 #include "cmainwindow.h"
+#include "sapplication.h"
 #include <QDebug>
+#include <QPainter>
+#include <QStyle>
+#include <QStyleOption>
 
 SToolBar::SToolBar(QWidget *parent) :
     QToolBar(parent),
@@ -30,17 +34,12 @@ void SToolBar::setActions(QList<QAction*> actions) {
 }
 
 void SToolBar::dropEvent(QDropEvent *event) {
-    if (event->mimeData()->hasFormat("actions/x-actiondata")) {
+    if (event->mimeData()->hasFormat("actions/x-actiondata") && isUserToolBar) {
         QByteArray itemData = event->mimeData()->data("actions/x-actiondata");
         QString name = itemData;
 
-        for(int i = 0; i < s_actions.count(); i++) {
-            if(s_actions[i]->data().toString() == name) {
-                addAction(s_actions[i]);
-                event->accept();
-            }
-        }
-
+        QAction *at = actionAt(event->pos());
+        insertAction(at, SApplication::inst()->mainWindow()->sactions[name]);
         event->accept();
     }
     else {
@@ -49,7 +48,7 @@ void SToolBar::dropEvent(QDropEvent *event) {
 }
 
 void SToolBar::dragMoveEvent(QDragMoveEvent *event) {
-    if(event->mimeData()->hasFormat("actions/x-actiondata")) {
+    if(event->mimeData()->hasFormat("actions/x-actiondata") && isUserToolBar) {
         event->setDropAction(Qt::MoveAction);
         event->accept();
     }
@@ -59,8 +58,9 @@ void SToolBar::dragMoveEvent(QDragMoveEvent *event) {
 }
 
 void SToolBar::dragEnterEvent(QDragEnterEvent *event) {
-    if (event->mimeData()->hasFormat("actions/x-actiondata"))
+    if (event->mimeData()->hasFormat("actions/x-actiondata") && isUserToolBar) {
         event->accept();
+    }
     else
         event->ignore();
 }
@@ -71,4 +71,15 @@ bool SToolBar::isUser() {
 
 void SToolBar::setUser(bool value) {
     isUserToolBar = value;
+}
+
+void SToolBar::paintEvent(QPaintEvent *event) {
+    QPainter painter(this);
+    QToolBar::paintEvent(event);
+}
+
+bool SToolBar::event(QEvent *event) {
+    if(event->type() == QEvent::MouseMove) {
+    }
+    return QToolBar::event(event);
 }
