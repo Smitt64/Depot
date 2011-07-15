@@ -9,24 +9,21 @@
 #include <QPushButton>
 #include <QDialogButtonBox>
 #include <QStylePainter>
-#include "cmainwindow.h"
 #include "stoolbar.h"
 
 class SActionListWidget : public QListWidget
 {
     Q_OBJECT
 public:
-    SActionListWidget(QWidget *parent = 0);
+    SActionListWidget(QMainWindow *wnd, QWidget *parent = 0);
     ~SActionListWidget();
-
-    void setActionList(QList<QAction*> actions);
-
-private:
-    QList<QAction*> s_actions;
 
 protected:
     virtual void dragEnterEvent(QDragEnterEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
+
+private:
+    QMainWindow *window;
 };
 
 
@@ -34,8 +31,11 @@ class SCustomizeDlg : public QDialog
 {
     Q_OBJECT
 public:
-    explicit SCustomizeDlg(QWidget *parent = 0);
+    explicit SCustomizeDlg(QMainWindow *wnd, QWidget *parent = 0);
     ~SCustomizeDlg();
+
+public slots:
+    void show();
 
 private slots:
     void addUserToolBar();
@@ -48,8 +48,7 @@ private:
     QListWidget *tool_list;
     SActionListWidget *action_list;
     QPushButton *create_toolbar, *remove_toolbar;
-    CMainWindow *wnd;
-    SToolBar *test_bar;
+    QMainWindow *window;
 };
 
 #endif // SCUSTOMIZEDLG_H

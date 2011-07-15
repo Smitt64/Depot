@@ -6,31 +6,27 @@
 #include <QInputDialog>
 #include <QPainter>
 
-#define MAIN(x) (((CMainWindow*)(x)))
+#define MAIN(x)(((CMainWindow*)(x)))
 
-SActionListWidget::SActionListWidget(QWidget *parent) :
-    QListWidget(parent)
+SActionListWidget::SActionListWidget(QMainWindow *wnd, QWidget *parent) :
+    QListWidget(parent),
+    window(wnd)
 {
+    QStringList keys = MAIN(window)->sactions.keys();
+    for(int i = 0; i < keys.count(); i++) {
+        QListWidgetItem *item = new QListWidgetItem;
+        item->setText(MAIN(window)->sactions[keys[i]]->text());
+        item->setData(Qt::UserRole, MAIN(window)->sactions[keys[i]]->data());
+        item->setIcon(MAIN(window)->sactions[keys[i]]->icon());
+        item->setToolTip(MAIN(window)->sactions[keys[i]]->statusTip());
+
+        addItem(item);
+    }
 }
 
 SActionListWidget::~SActionListWidget()
 {
 
-}
-
-void SActionListWidget::setActionList(QList<QAction*> actions) {
-    s_actions = actions;
-    for(int i = 0; i < actions.count(); i++) {
-        QListWidgetItem *item = new QListWidgetItem;
-        item->setText(actions[i]->text());
-        item->setData(Qt::UserRole, actions[i]->data());
-        item->setIcon(actions[i]->icon());
-        item->setToolTip(actions[i]->statusTip());
-
-        addItem(item);
-    }
-
-    sortItems();
 }
 
 void SActionListWidget::mousePressEvent(QMouseEvent *event) {
@@ -63,10 +59,12 @@ void SActionListWidget::dragEnterEvent(QDragEnterEvent *event) {
 
 ////////////////////////////////////////////////////////////////////////
 
-SCustomizeDlg::SCustomizeDlg(QWidget *parent) :
-    QDialog(parent)
+SCustomizeDlg::SCustomizeDlg(QMainWindow *wnd, QWidget *parent) :
+    QDialog(parent),
+    window(wnd)
 {
     setWindowTitle(tr("Customizing"));
+    setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     tab = new QTabWidget;
     tool_list = new QListWidget;
     buttons = new QDialogButtonBox;
@@ -97,35 +95,37 @@ SCustomizeDlg::SCustomizeDlg(QWidget *parent) :
     //Tab2 - Commands
     QWidget *page2 = new QWidget;
     tab2_layout = new QVBoxLayout;
-    wnd = new CMainWindow;
-    test_bar = wnd->addToolBar("test", "test");
-    test_bar->setActions(MAIN(parent)->actionList());
-    action_list = new SActionListWidget;
-    action_list->setActionList(MAIN(parent)->actionList());
+    action_list = new SActionListWidget(window);
 
     tab2_layout->addWidget(action_list);
-    tab2_layout->addWidget(wnd);
     page2->setLayout(tab2_layout);
 
     tab->addTab(page1, tr("Toolbars"));
     tab->addTab(page2, tr("Commands"));
 
-    QStringList keys = MAIN(parent)->toolBars.keys();
-    for(int i = 0; i < keys.count(); i++) {
-        QListWidgetItem *item = new QListWidgetItem;
-        item->setText(MAIN(parent)->toolBars[keys[i]]->windowTitle());
-        item->setData(Qt::UserRole, keys[i]);
-        item->setCheckState((MAIN(parent)->toolBars[keys[i]]->isVisible() ? Qt::Checked : Qt::Unchecked));
-
-        tool_list->addItem(item);
-    }
-
+    connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
+    connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
     connect(create_toolbar, SIGNAL(clicked()), this, SLOT(addUserToolBar()));
     connect(tool_list, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(onClickActionItem(QListWidgetItem*)));
 }
 
 SCustomizeDlg::~SCustomizeDlg() {
     SAFE_DELETE(layout);
+}
+
+void SCustomizeDlg::show() {
+    tool_list->clear();
+    QStringList keys = MAIN(window)->toolBars.keys();
+    for(int i = 0; i < keys.count(); i++) {
+        QListWidgetItem *item = new QListWidgetItem;
+        item->setText(MAIN(window)->toolBars[keys[i]]->windowTitle());
+        item->setData(Qt::UserRole, keys[i]);
+        item->setCheckState((MAIN(window)->toolBars[keys[i]]->isVisible() ? Qt::Checked : Qt::Unchecked));
+
+        tool_list->addItem(item);
+    }
+
+    QDialog::show();
 }
 
 void SCustomizeDlg::addUserToolBar() {
@@ -136,15 +136,20 @@ void SCustomizeDlg::addUserToolBar() {
 
     if(!ok || text.isEmpty())
         return;
+
+    QString name = QString("user_bar_%1").arg(MAIN(window)->toolBars.count());
+    QListWidgetItem *item = new QListWidgetItem;
+    item->setText(text);
+    item->setCheckState(Qt::Checked);
+    item->setData(Qt::UserRole, name);
+
+    tool_list->addItem(item);
+
+    SToolBar *bar = MAIN(window)->addToolBar(text, name);
+    bar->setUser(true);
 }
 
 void SCustomizeDlg::onClickActionItem(QListWidgetItem *item) {
-    if(MAIN(parent())->toolBars[item->data(Qt::UserRole).toString()]->isUser() == false) {
-        remove_toolbar->setEnabled(false);
-        tab->widget(1)->setEnabled(false);
-    }
-    else {
-        remove_toolbar->setEnabled(true);
-        tab->widget(1)->setEnabled(true);
-    }
+    MAIN(window)->toolBars[item->data(Qt::UserRole).toString()]
+            ->setVisible((item->checkState() == Qt::Checked ? true : false));
 }
