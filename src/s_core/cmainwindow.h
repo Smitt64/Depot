@@ -11,10 +11,8 @@
 #include <QStatusBar>
 #include <QRect>
 #include <QDockWidget>
-#include "sproject.h"
 #include "stoolbar.h"
-
-class QToolBar;
+#include "scustomizedlg.h"
 
 class CMainWindow : public QMainWindow {
     Q_OBJECT
@@ -49,7 +47,7 @@ private slots:
     void dockVisiblseChanged(bool value);
     void canUndo(bool value);
     void canRedo(bool value);
-    void tool_customize();
+    void customizeDlgClosed(int result);
 
 private:
     QMap<QString, SToolBar*> toolBars;
@@ -57,6 +55,7 @@ private:
     QMap<QString, QMenu*> menus;
     QMap<QString, QDockWidget*> docks;
     QMenu *fileMenu, *editMenu,*viewMenu;
+    SCustomizeDlg *dlg;
 
 protected:
     virtual void closeEvent(QCloseEvent *event);

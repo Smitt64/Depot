@@ -290,7 +290,11 @@ void CMainWindow::makeServiceMenu() {
 
     QAction *customize = addAction(tr("Customize"), "custom_action", "service_menu");
 
-    connect(customize, SIGNAL(triggered()), this, SLOT(tool_customize()));
+    dlg = new SCustomizeDlg(this, this);
+    dlg->setWindowModality(Qt::NonModal);
+
+    connect(dlg, SIGNAL(finished(int)), this, SLOT(customizeDlgClosed(int)));
+    connect(customize, SIGNAL(triggered()), dlg, SLOT(show()));
 }
 
 QList<QAction*> CMainWindow::actionList() {
@@ -303,8 +307,6 @@ QList<QAction*> CMainWindow::actionList() {
     return list;
 }
 
-void CMainWindow::tool_customize() {
-    SCustomizeDlg *dlg = new SCustomizeDlg(this);
-
-    dlg->exec();
+void CMainWindow::customizeDlgClosed(int result) {
+    qDebug() << dlg->result() << QDialog::Accepted << QDialog::Rejected;
 }
