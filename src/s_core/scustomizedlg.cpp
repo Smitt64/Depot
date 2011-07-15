@@ -76,6 +76,9 @@ SCustomizeDlg::SCustomizeDlg(QMainWindow *wnd, QWidget *parent) :
     remove_toolbar = actions->addButton(tr("Remove"), QDialogButtonBox::ActionRole);
     remove_toolbar->setEnabled(false);
     remove_toolbar->setWhatsThis(tr("Removing toolbar."));
+    clear_toolbar = actions->addButton(tr("Clear"), QDialogButtonBox::ActionRole);
+    clear_toolbar->setEnabled(false);
+    clear_toolbar->setWhatsThis(tr("Removing all actions from toolbar."));
 
     buttons->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
@@ -106,6 +109,8 @@ SCustomizeDlg::SCustomizeDlg(QMainWindow *wnd, QWidget *parent) :
     connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
     connect(create_toolbar, SIGNAL(clicked()), this, SLOT(addUserToolBar()));
+    connect(remove_toolbar, SIGNAL(clicked()), this, SLOT(removeUserToolBar()));
+    connect(clear_toolbar, SIGNAL(clicked()), this, SLOT(clearToolBar()));
     connect(tool_list, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(onClickActionItem(QListWidgetItem*)));
 }
 
@@ -150,6 +155,25 @@ void SCustomizeDlg::addUserToolBar() {
 }
 
 void SCustomizeDlg::onClickActionItem(QListWidgetItem *item) {
-    MAIN(window)->toolBars[item->data(Qt::UserRole).toString()]
-            ->setVisible((item->checkState() == Qt::Checked ? true : false));
+    SToolBar *bar = MAIN(window)->toolBars[item->data(Qt::UserRole).toString()];
+    bar->setVisible((item->checkState() == Qt::Checked ? true : false));
+
+    if(bar->isUser()) {
+        remove_toolbar->setEnabled(true);
+        clear_toolbar->setEnabled(true);
+    }else {
+        remove_toolbar->setEnabled(false);
+        clear_toolbar->setEnabled(false);
+    }
+}
+
+void SCustomizeDlg::removeUserToolBar() {
+    QString name = tool_list->currentItem()->data(Qt::UserRole).toString();
+    MAIN(window)->removeToolBar((QToolBar*)MAIN(window)->toolBars[name]);
+    MAIN(window)->toolBars.remove(name);
+}
+
+void SCustomizeDlg::clearToolBar() {
+    QString name = tool_list->currentItem()->data(Qt::UserRole).toString();
+    MAIN(window)->toolBars[name]->clear();
 }

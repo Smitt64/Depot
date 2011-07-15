@@ -39,6 +39,8 @@ public slots:
 
 private slots:
     void addUserToolBar();
+    void removeUserToolBar();
+    void clearToolBar();
     void onClickActionItem(QListWidgetItem *item);
 
 private:
@@ -47,7 +49,7 @@ private:
     QBoxLayout *layout, *tab1_layout, *tab2_layout;
     QListWidget *tool_list;
     SActionListWidget *action_list;
-    QPushButton *create_toolbar, *remove_toolbar;
+    QPushButton *create_toolbar, *remove_toolbar, *clear_toolbar;
     QMainWindow *window;
 };
 
