@@ -3,6 +3,7 @@
 #include "sproject.h"
 #include "scustomizedlg.h"
 #include <QtGui>
+#include <QDomDocument>
 #include <QTreeWidget>
 
 CMainWindow::CMainWindow(QWidget *parent) :
@@ -26,6 +27,38 @@ CMainWindow::~CMainWindow() {
 }
 
 void CMainWindow::restore() {
+    QDomDocument doc;
+    if(doc.setContent(SApplication::inst()->settings("window/user_toolbars").toByteArray())) {
+        QDomElement root = doc.documentElement();
+
+        for(QDomNode n = root.firstChild(); !n.isNull(); n = n.nextSibling()) {
+            QDomElement bar_element = n.toElement();
+            if(bar_element.tagName() != "bar")
+                continue;
+            QString title = bar_element.attribute("title", "");
+            QString name = bar_element.attribute("name", "");
+
+            if(title.isEmpty() || name.isEmpty())
+                continue;
+
+            SToolBar *bar = addToolBar(title, name);
+            bar->setUser(true);
+
+            for(QDomNode n2 = bar_element.firstChild(); !n2.isNull(); n2 = n2.nextSibling()) {
+                 QDomElement action_element = n2.toElement();
+                 if(action_element.tagName() == "action") {
+                     QString name = action_element.attribute("name", "");
+                     if(name.isEmpty())
+                         continue;
+                     if(sactions.contains(name))
+                         bar->addAction(sactions[name]);
+                 }
+                 else if(action_element.tagName() == "separator") {
+                     bar->addSeparator();
+                 }
+            }
+        }
+    }
     restoreState(SApplication::inst()->settings("window/state").toByteArray());
     restoreGeometry(SApplication::inst()->settings("window/geometry").toByteArray());
 
@@ -77,11 +110,13 @@ QAction *CMainWindow::addAction(const QString &title,
         sactions.insert(name, (icon.isNull() ?  menus[menu]->addAction(title) :
                                                 menus[menu]->addAction(icon, title)));
         sactions.value(name)->setData(name);
+        sactions.value(name)->setObjectName(name);
         return sactions.value(name);
     }
     else {
        sactions.insert(name, menuBar()->addAction(title));
        sactions.value(name)->setData(name);
+       sactions.value(name)->setObjectName(name);
        return sactions[name];
     }
 }
@@ -98,6 +133,7 @@ QAction *CMainWindow::addAction(QAction *action,
         menuBar()->addAction(action);
     sactions.insert(name, action);
     sactions[name]->setData(name);
+    sactions[name]->setObjectName(name);
     return sactions[name];
 }
 
@@ -307,6 +343,40 @@ QList<QAction*> CMainWindow::actionList() {
     return list;
 }
 
-void CMainWindow::customizeDlgClosed(int result) {
-    qDebug() << dlg->result() << QDialog::Accepted << QDialog::Rejected;
+void CMainWindow::customizeDlgClosed(int result) {   
+    if(result == QDialog::Rejected)
+        return;
+
+    QByteArray data;
+    QTextStream stream(&data, QIODevice::WriteOnly);
+    stream.setCodec("UTF-8");
+    QDomDocument doc("user_toolbars");
+    QDomElement root = doc.createElement("toolbars");
+
+    foreach (SToolBar *bar, toolBars) {
+        if(!bar->isUser())
+            continue;
+
+        QDomElement bar_element = doc.createElement("bar");
+        bar_element.setAttribute("name", bar->objectName());
+        bar_element.setAttribute("title", bar->windowTitle());
+        QList<QAction*> bar_actions = bar->actions();
+
+        foreach (QAction *action, bar_actions) {
+            if(action->isSeparator()) {
+                QDomElement sep_element = doc.createElement("separator");
+                bar_element.appendChild(sep_element);
+            } else {
+                QDomElement action_element = doc.createElement("action");
+                action_element.setAttribute("name", action->objectName());
+                action_element.appendChild(doc.createTextNode(action->text()));
+                bar_element.appendChild(action_element);
+            }
+        }
+        root.appendChild(bar_element);
+    }
+
+    doc.appendChild(root);
+    doc.save(stream, 3);
+    SApplication::inst()->writeSettings("window/user_toolbars", data);
 }
