@@ -4,7 +4,8 @@
 SApplication *SApplication::s_App = NULL;
 
 SApplication::SApplication(int argc, char **args) :
-    s_project(NULL)
+    s_project(NULL),
+    mainWnd(NULL)
 {
     QCoreApplication::setOrganizationName("Serpkov_Nikita");
     QCoreApplication::setApplicationName("TestBuilder");
@@ -68,4 +69,12 @@ QObject *SApplication::project() {
         s_project = new SProject;
 
     return (QObject*)s_project;
+}
+
+void SApplication::setMainWindow(CMainWindow *value) {
+    mainWnd = value;
+}
+
+CMainWindow *SApplication::mainWindow() {
+    return mainWnd;
 }
