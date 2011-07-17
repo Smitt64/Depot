@@ -7,6 +7,8 @@
 #include "sapplication.h"
 #include "commands.h"
 #include "questionsmodel.h"
+#include "interfaces/testtype_interface.h"
+#include "interfaces/questeditor_interface.h"
 
 #define S_PROJECT ((SProject*)(SApplication::inst()->project()))
 
@@ -26,6 +28,8 @@ class SProject : public QObject
     Q_PROPERTY(bool in_redactor_mode READ isRedactorMode WRITE setRedactorMode)
 public:
     explicit SProject(QObject *parent = 0);
+
+    void loadPlugins();
 
     bool isRedactorMode();
     void setRedactorMode(bool value);
@@ -50,6 +54,8 @@ public:
     QuestionsModel *questions();
     QStandardItemModel *questTypes();
 
+    QuestEditorInterface *questEditing(QString name);
+
 signals:
     void themeAdded(QString title, QString alias);
     void themeRemoved(QString alias);
@@ -61,7 +67,7 @@ private:
     FSHANDLE *file_handle, *temp_handle;
     QUndoStack *undo_stack;
     QMap<QString, theme*> themes;
-    //QMap<QString, question*> questions;
+    QList<TestType_Interface*> testTypesPlugins;
     QuestionsModel *quest_model;
     QStandardItemModel *quest_types;
     int thmes_counter, res_counter;

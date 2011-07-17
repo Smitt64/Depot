@@ -2,6 +2,9 @@
 #include <QDomDocument>
 #include <QDir>
 #include <QFileInfo>
+#include <QPluginLoader>
+#include <QStandardItem>
+#include "defaulttesttypes/default_tst_types.h"
 
 SProject::SProject(QObject *parent) :
     QObject(parent),
@@ -19,15 +22,38 @@ SProject::SProject(QObject *parent) :
     quest_types->setHeaderData(1, Qt::Horizontal, tr("Name"));
     quest_types->setHeaderData(2, Qt::Horizontal, tr("Plugin"));
 
+    //
+    TestType_Interface *closed_interface = new Closed_Question;
+    testTypesPlugins.push_back(closed_interface);
+    QStandardItem *item = testTypesPlugins.last()->questinfo();
     quest_types->insertRow(0);
-    quest_types->setData(quest_types->index(0, 0), tr("Question with variants of answers"));
-    quest_types->setData(quest_types->index(0, 1), "closed_question");
-    quest_types->setData(quest_types->index(0, 2), "default");
+    quest_types->setData(quest_types->index(0, 0), item->child(0)->text());
+    quest_types->setData(quest_types->index(0, 1), item->child(1)->text());
+    quest_types->setData(quest_types->index(0, 2), QVariant(0));
 
-    quest_types->insertRow(1);
-    quest_types->setData(quest_types->index(1, 0), tr("Free choice"));
-    quest_types->setData(quest_types->index(1, 1), "opened_question");
-    quest_types->setData(quest_types->index(1, 2), "default");
+    loadPlugins();
+}
+
+void SProject::loadPlugins() {
+    QDir pluginsDir = QDir(qApp->applicationDirPath());
+    pluginsDir.cd("TestTypes");
+
+    int rows = quest_types->rowCount();
+    foreach(QString fileName, pluginsDir.entryList(QDir::Files)){
+        QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
+        QObject *plugin = loader.instance();
+
+        if(plugin){
+            testTypesPlugins.push_back(qobject_cast<TestType_Interface*>(plugin));
+            QStandardItem *item = testTypesPlugins.last()->questinfo();
+
+            quest_types->insertRow(rows);
+            quest_types->setData(quest_types->index(rows, 0, QModelIndex()), item->child(0)->text());
+            quest_types->setData(quest_types->index(rows, 1, QModelIndex()), item->child(1)->text());
+            quest_types->setData(quest_types->index(rows, 2, QModelIndex()), rows);
+            rows ++;
+        }
+    }
 }
 
 void SProject::setRedactorMode(bool value) {
@@ -179,4 +205,15 @@ QStandardItemModel *SProject::questTypes() {
 
 int *SProject::resourceCounter() {
     return (int*)&res_counter;
+}
+
+QuestEditorInterface *SProject::questEditing(QString name) {
+    for(int i = 0; i < quest_types->rowCount(); i++) {
+        QString str = quest_types->data(quest_types->index(i, 1)).toString();
+                //->item(i, 1)->text();
+        if(str == name)
+            return testTypesPlugins[quest_types->data(quest_types->index(i, 2)).toInt()]->editor();
+                    //quest_types->item(i, 2)->text().toInt()]->editor();
+    }
+    return NULL;
 }
