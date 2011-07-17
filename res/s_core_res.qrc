@@ -14,6 +14,8 @@
         <file alias="undo">toolbar/Edit_UndoHS.png</file>
         <file alias="addtheme">toolbar/add_theme.png</file>
         <file alias="removetheme">toolbar/remove_theme.png</file>
-        <file alias="theme">toolbar/theme.png</file>
+        <file alias="theme">icons/theme.png</file>
+        <file alias="themegroup">icons/theme_group.png</file>
+        <file alias="separator">icons/separator.png</file>
     </qresource>
 </RCC>
