@@ -22,6 +22,12 @@ SActionListWidget::SActionListWidget(QMainWindow *wnd, QWidget *parent) :
 
         addItem(item);
     }
+
+    QListWidgetItem *item = new QListWidgetItem;
+    item->setText(tr("Separator"));
+    item->setBackground(QBrush(Qt::lightGray, Qt::Dense6Pattern));
+    item->setData(Qt::UserRole, "Separator");
+    addItem(item);
 }
 
 SActionListWidget::~SActionListWidget()
@@ -43,8 +49,19 @@ void SActionListWidget::mousePressEvent(QMouseEvent *event) {
     QDrag *drag = new QDrag(this);
     drag->setMimeData(mimeData);
     QPixmap map = item->icon().pixmap(64, 64, QIcon::Normal, QIcon::On);
-    drag->setPixmap(map);
-    drag->setHotSpot(QPoint(map.width() / 2, map.height() / 2));
+
+    QPixmap icon(32, 32);
+    icon.fill(Qt::transparent);
+    QPainter painter;
+    painter.begin(&icon);
+    if(data != "Separator")
+        painter.drawPixmap(0, 0, 16, 16, map);
+    else
+        painter.drawPixmap(0, 0, 16, 16, QPixmap(":/separator"));
+    painter.end();
+
+    drag->setPixmap(icon);
+    drag->setHotSpot(QPoint(icon.width() / 2, icon.height() / 2));
 
     if(drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction) == Qt::MoveAction) {
 
@@ -155,6 +172,9 @@ void SCustomizeDlg::addUserToolBar() {
 }
 
 void SCustomizeDlg::onClickActionItem(QListWidgetItem *item) {
+    if(!item)
+        return;
+
     SToolBar *bar = MAIN(window)->toolBars[item->data(Qt::UserRole).toString()];
     bar->setVisible((item->checkState() == Qt::Checked ? true : false));
 
@@ -171,6 +191,9 @@ void SCustomizeDlg::removeUserToolBar() {
     QString name = tool_list->currentItem()->data(Qt::UserRole).toString();
     MAIN(window)->removeToolBar((QToolBar*)MAIN(window)->toolBars[name]);
     MAIN(window)->toolBars.remove(name);
+    delete tool_list->currentItem();
+
+    onClickActionItem(tool_list->currentItem());
 }
 
 void SCustomizeDlg::clearToolBar() {

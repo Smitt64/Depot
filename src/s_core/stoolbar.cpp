@@ -39,6 +39,11 @@ void SToolBar::dropEvent(QDropEvent *event) {
         QString name = itemData;
 
         QAction *at = actionAt(event->pos());
+        if(name == "Separator") {
+            insertSeparator(at);
+            event->accept();
+            return;
+        }
         insertAction(at, SApplication::inst()->mainWindow()->sactions[name]);
         event->accept();
     }
