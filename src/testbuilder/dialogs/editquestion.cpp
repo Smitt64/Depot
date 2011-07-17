@@ -6,21 +6,21 @@ EditQuestionDlg::EditQuestionDlg(QWidget *parent) :
     QDialog(parent)
 {
     setWindowTitle(tr("Creating question"));
+    setMinimumSize(640, 480);
     buttons = new QDialogButtonBox;
 
     quest_type = new QComboBox;
+    quest_type->setWhatsThis(tr("List of accessible questions types."));
     quest_type->setModel(S_PROJECT->questTypes());
-
-    tabWidget = new QTabWidget;
-    tabWidget->addTab(new QWidget, tr("Editing question"));
-    tabWidget->setMinimumSize(320, 240);
 
     form = new QFormLayout;
     form->addRow(tr("Question type: "), quest_type);
 
     layout = new QVBoxLayout;
     layout->addLayout(form);
-    layout->addWidget(tabWidget);
+    layout->addWidget((QWidget*)
+                      S_PROJECT->questEditing(((QStandardItemModel*)(quest_type->model()))->item(quest_type->currentIndex(), 1)->text()));
+    //layout->addWidget(tabWidget);
 
     setLayout(layout);
 
@@ -28,8 +28,13 @@ EditQuestionDlg::EditQuestionDlg(QWidget *parent) :
 
     connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(quest_type, SIGNAL(currentIndexChanged(int)), this, SLOT(questTypeChanged(int)));
 }
 
 EditQuestionDlg::~EditQuestionDlg() {
     SAFE_DELETE(buttons);
+}
+
+void EditQuestionDlg::questTypeChanged(int index) {
+
 }

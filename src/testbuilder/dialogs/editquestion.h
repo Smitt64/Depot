@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QTabWidget>
+#include "interfaces/questeditor_interface.h"
 
 class EditQuestionDlg : public QDialog
 {
@@ -17,6 +18,9 @@ class EditQuestionDlg : public QDialog
 public:
     EditQuestionDlg(QWidget *parent = 0);
     ~EditQuestionDlg();
+
+private slots:
+    void questTypeChanged(int index);
 
 private:
     QDialogButtonBox  *buttons;
@@ -26,6 +30,7 @@ private:
     QPushButton *cancel;
     QFormLayout *form;
     QBoxLayout *layout;
+    QuestEditorInterface *tab1;
 };
 
 #endif // EDITQUESTION_H
