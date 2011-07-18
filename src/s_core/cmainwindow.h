@@ -56,6 +56,7 @@ private:
     QMap<QString, QDockWidget*> docks;
     QMenu *fileMenu, *editMenu,*viewMenu;
     SCustomizeDlg *dlg;
+    QAction *viewSeparator;
 
 protected:
     virtual void closeEvent(QCloseEvent *event);

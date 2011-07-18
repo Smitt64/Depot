@@ -31,6 +31,11 @@ SProject::SProject(QObject *parent) :
     quest_types->setData(quest_types->index(0, 1), item->child(1)->text());
     quest_types->setData(quest_types->index(0, 2), QVariant(0));
 
+    themes_model = new QStandardItemModel;
+    themes_model->setColumnCount(2);
+    themes_model->setHeaderData(0, Qt::Horizontal, "Theme");
+    themes_model->setHeaderData(1, Qt::Horizontal, "Alias");
+
     loadPlugins();
 }
 
@@ -163,6 +168,12 @@ bool SProject::addTheme(const QString &title, const QString &alias) {
 
     themes.insert(th->alias, th);
 
+    int row = themes_model->rowCount();
+    themes_model->insertRow(row);
+    themes_model->setData(themes_model->index(row, 0), title, Qt::DisplayRole);
+    themes_model->setData(themes_model->index(row, 0), title, Qt::CheckStateRole);
+    themes_model->setData(themes_model->index(row, 1), th->alias, Qt::DisplayRole);
+
     emit themeAdded(th->name, th->alias);
 
     return true;
@@ -186,6 +197,10 @@ QString SProject::themeTitle(const QString &alias) {
 void SProject::removeTheme(const QString &alias) {
     if(themes.contains(alias))
     {
+        for(int i = 0; i < themes_model->rowCount(); i++) {
+            if(themes_model->item(i, 1)->text() == alias)
+                themes_model->removeRow(i);
+        }
         themes.remove(alias);
         emit themeRemoved(alias);
     }
@@ -216,4 +231,8 @@ QuestEditorInterface *SProject::questEditing(QString name) {
                     //quest_types->item(i, 2)->text().toInt()]->editor();
     }
     return NULL;
+}
+
+QStandardItemModel *SProject::themesModel() {
+    return themes_model;
 }

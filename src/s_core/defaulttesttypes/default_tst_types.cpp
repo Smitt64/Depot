@@ -8,7 +8,7 @@ ClosedTestEditor::ClosedTestEditor() :
 {
     text_editor = new STextEditorView;
     QTabWidget *tab = new QTabWidget;
-    tab->addTab(text_editor, tr("Editing question"));
+    tab->addTab(text_editor, QObject::tr("Editing question"));
     QBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(tab);
 

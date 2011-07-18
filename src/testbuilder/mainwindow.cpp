@@ -17,9 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     tst_struct(NULL),
     theme_item(NULL)
 {
-    QTableView *view = new QTableView;
-    view->setModel(S_PROJECT->questTypes());
-    setCentralWidget(view);
+    //setCentralWidget(view);
     setWindowTitle(tr("TestBuiler"));
     setDockOptions(QMainWindow::VerticalTabs);
     makeFileMenu();

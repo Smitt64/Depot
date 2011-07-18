@@ -10,7 +10,8 @@ CMainWindow::CMainWindow(QWidget *parent) :
     QMainWindow(parent),
     fileMenu(NULL),
     editMenu(NULL),
-    viewMenu(NULL)
+    viewMenu(NULL),
+    viewSeparator(NULL)
 {
     setProperty("size", QSize(640, 480));
     setCentralWidget(new QWidget);
@@ -75,12 +76,20 @@ SToolBar *CMainWindow::addToolBar(const QString &title,
     toolBars.insert(name, bar);
     toolBars[name]->setIconSize(SApplication::inst()->settings("interface/tb_iconsize",
                                                                 QSize(16, 16)).toSize());
+    if(viewSeparator) {
+        menus["View"]->insertAction(viewSeparator, bar->toggleViewAction());
+    }
+
     return toolBars.value(name);
 }
 
 SToolBar *CMainWindow::addToolBar(SToolBar *bar) {
     QMainWindow::addToolBar((QToolBar*)bar);
     toolBars.insert(bar->objectName(), bar);
+
+    if(viewSeparator) {
+        menus["View"]->insertAction(viewSeparator, bar->toggleViewAction());
+    }
 
     return toolBars.value(bar->objectName());
 }
@@ -226,27 +235,22 @@ void CMainWindow::makeViewMenu() {
 
     QAction *action;
     foreach (SToolBar *bar, toolBars) {
-        action = addAction(bar->windowTitle(), bar->windowTitle(), "View");
-        action->setData(toolBars.key(bar));
-        action->setCheckable(true);
-        action->setChecked(SApplication::inst()->settings(QString("view/%1")
-                                                          .arg(action->data().toString()),
-                                                          true).toBool());
-        bar->setVisible(action->isChecked());
-
-        connect(action, SIGNAL(triggered(bool)), this, SLOT(checkToolBars(bool)));
+        viewMenu->addAction(bar->toggleViewAction());
     }
+
+    if(!statusBar()) {
+        setStatusBar(new QStatusBar);
+    }
+
     addAction(tr("Status bar"), "sb", "View");
     sactions["sb"]->setCheckable(true);
     sactions["sb"]->setStatusTip(tr("Show/hide status bar..."));
     sactions["sb"]->setChecked(SApplication::inst()->settings("view/status_bar", true).toBool());
-    if(!statusBar()) {
-        setStatusBar(new QStatusBar);
-    }
+
     statusBar()->setVisible(sactions["sb"]->isChecked());
     connect(sactions["sb"], SIGNAL(triggered(bool)), this, SLOT(checkStatusBar(bool)));
 
-    menus["View"]->addSeparator();
+    viewSeparator = menus["View"]->addSeparator();
     QAction *fullscrAction = addAction(tr("Full screen"), "fullscreen", "View", QIcon(":/fullscreen"));
     fullscrAction->setCheckable(true);
     fullscrAction->setStatusTip(tr("Show window full screen..."));

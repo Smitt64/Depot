@@ -17,5 +17,7 @@ int main(int argc, char **args)
     MainWindow w;
     w.show();
 
+    a.setMainWindow(&w);
+
     return a.app()->exec();
 }

@@ -53,6 +53,7 @@ public:
 
     QuestionsModel *questions();
     QStandardItemModel *questTypes();
+    QStandardItemModel *themesModel();
 
     QuestEditorInterface *questEditing(QString name);
 
@@ -70,6 +71,7 @@ private:
     QList<TestType_Interface*> testTypesPlugins;
     QuestionsModel *quest_model;
     QStandardItemModel *quest_types;
+    QStandardItemModel *themes_model;
     int thmes_counter, res_counter;
 };
 

@@ -19,7 +19,11 @@ HEADERS = sapplication.h \
     s_texteditwidget.h \
     stexteditor.h \
     scustomizedlg.h \
-    stoolbar.h
+    stoolbar.h \
+    interfaces/questeditor_interface.h \
+    interfaces/testtype_interface.h \
+    defaulttesttypes/default_tst_types.h \
+    scombobox.h
 
 SOURCES = sapplication.cpp \
           cmainwindow.cpp \
@@ -30,7 +34,9 @@ SOURCES = sapplication.cpp \
     s_texteditwidget.cpp \
     stexteditor.cpp \
     scustomizedlg.cpp \
-    stoolbar.cpp
+    stoolbar.cpp \
+    defaulttesttypes/default_tst_types.cpp \
+    scombobox.cpp
 
 RESOURCES += \
     ../../res/s_core_res.qrc

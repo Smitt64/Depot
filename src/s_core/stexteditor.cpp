@@ -28,6 +28,7 @@ STextEditorView::STextEditorView(QWidget *parent) :
     tool_bar = addToolBar(tr("Formating"));
     tool_bar->addWidget(size_box);
     tool_bar->addWidget(font_box);
+    tool_bar->addSeparator();
 }
 
 /////////////////////////////////////////////////////////////////////////
