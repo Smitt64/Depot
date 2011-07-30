@@ -1,6 +1,4 @@
 ﻿#include "filesystem.h"
-#include <QtDebug>
-#include <qdebug.h>
 #include <QDataStream>
 #include <QObject>
 #include <QFileInfo>
@@ -37,16 +35,6 @@ bool FileSystem::fsOpen(const QString &fname, FSHANDLE *handle)
         handle->dataHeader = new Header();
 
         handle->file.read(((char*)(handle->dataHeader)), sizeof(Header));
-
-#ifndef FS_DEBUG
-        qDebug("Version: %i", handle->dataHeader->m_pVersion);
-        qDebug("Files: %i", handle->dataHeader->m_pFileCount);
-        qDebug("File block size: %i", handle->dataHeader->m_pFileBlockSize);
-        qDebug("Archive size: %i", (int)handle->file.size());
-
-        qDebug("sizeof(Header): %i", sizeof(Header));
-        qDebug("sizeof(File): %i", sizeof(File));
-#endif
         if(handle->dataHeader->m_pVersion != 121)//Проверить версию
             return false;
 
@@ -123,7 +111,7 @@ bool FileSystem::fsWriteFile(QByteArray data, QString name, bool temp, FSHANDLE 
     info.m_pCompressedSize = compressed.size();
     info.m_pCompressLevel = compressLevel;
 
-    strcpy(info.m_pName, name.toLocal8Bit().data());
+    qstrcpy(info.m_pName, name.toLocal8Bit().data());
     strcpy(info.m_pExtension, this->fsGetExstension(name).toLocal8Bit().data());
 
     info.m_pSize = data.size();
@@ -132,20 +120,9 @@ bool FileSystem::fsWriteFile(QByteArray data, QString name, bool temp, FSHANDLE 
 
     handle->fileList.push_back(info);
 
-#ifndef FS_DEBUG
-    qDebug("Source file: %s", name.toLocal8Bit().data());
-    qDebug("Source extension: %s", info.m_pExtension);
-    qDebug("Source file size: %i", data.size());
-    qDebug("Compressed size: %i", info.m_pCompressedSize);
-#endif
-
     //Изменить размер файла архива
     handle->file.resize(sizeof(Header) + handle->dataHeader->m_pFileBlockSize +
                         sizeof(File) * handle->dataHeader->m_pFileCount);
-
-#ifndef FS_DEBUG
-    qDebug("New archive size: %i", handle->file.size());
-#endif
 
     fsWriteFileList(handle);
 
@@ -206,16 +183,7 @@ bool FileSystem::fsDelete(QString fileName, FSHANDLE *handle)
 
     //Если файл не найден
     if(!finded)
-    {
-#ifndef ARC_DEBUG
-        qDebug("File [%s] not found!", fileName.toLocal8Bit().data());
-#endif
         return false;
-    }
-
-#ifdef ARC_DEBUG
-    qDebug("File [%s] found at index %i.", fileName.toLocal8Bit().data(), index);
-#endif
 
     int size = file.m_pCompressedSize;//Размер файла после сжатия
 
@@ -295,16 +263,16 @@ QByteArray FileSystem::fsGetFile(QString name, FSHANDLE *handle)
 {
     QByteArray data;
 
-    for(int i = 0; i < handle->dataHeader->m_pFileCount; i++)
-    {
-        if(name == QString::fromLocal8Bit(handle->fileList[i].m_pName))
-        {
-            int pos = handle->fileList[i].m_pPosition;
-            int csize = handle->fileList[i].m_pCompressedSize;
-            handle->file.seek(pos);
-            data = handle->file.read(csize);
-            break;
+    foreach(File file, handle->fileList) {
+        if(qstrcmp(file.m_pName, name.toLocal8Bit().data()) != 0) {
+            continue;
         }
+
+        int pos = file.m_pPosition;
+        int csize = file.m_pCompressedSize;
+        handle->file.seek(pos);
+        data = handle->file.read(csize);
+        break;
     }
 
     return qUncompress(data);
@@ -326,9 +294,8 @@ void FileSystem::fsClose(FSHANDLE *handle)
 
 bool FileSystem::fsHasFile(QString name, FSHANDLE *handle)
 {
-    for(int i = 0; i < handle->dataHeader->m_pFileCount; i++)
-        if(QString::fromLocal8Bit(handle->fileList[i].m_pName) == name)
-            return true;
+    if(fsGetFileIndex(name, handle) != -1)
+        return true;
     return false;
 }
 
@@ -349,15 +316,8 @@ bool FileSystem::fsRewriteFile(QByteArray data, QString name, FSHANDLE *handle, 
     //Если файл не найден
     if(index == -1)
     {
-#ifdef FS_DEBUG
-        qDebug("File [%s] not found!", name.toLocal8Bit().data());
-#endif
         return false;
     }
-
-#ifdef FS_DEBUG
-    qDebug("File [%s] found at index %i.", name.toLocal8Bit().data(), index);
-#endif
 
     int size = handle->fileList[index].m_pCompressedSize;//Размер файла после сжатия
 
@@ -404,15 +364,6 @@ bool FileSystem::fsRewriteFile(QByteArray data, QString name, FSHANDLE *handle, 
     handle->file.resize(sizeof(Header) + handle->dataHeader->m_pFileBlockSize +
                         sizeof(File) * handle->dataHeader->m_pFileCount);
     //Перезаписать список файлов
-    /*handle->file.seek(sizeof(Header) + handle->dataHeader->m_pFileBlockSize);
-    //Перезаписать список файлов
-    for(int i = 0; i < handle->fileList.size(); i++)
-    {
-        File f = handle->fileList[i];
-
-        handle->file.write((const char*)&f, sizeof(File));
-        handle->file.flush();
-    }*/
     fsWriteFileList(handle);
 
     return true;
