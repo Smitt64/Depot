@@ -4,7 +4,8 @@
 addThemeCommand::addThemeCommand(const QString &title, QUndoCommand *parent) :
     QUndoCommand(parent),
     theme_alias(""),
-    theme_title(title)
+    theme_title(title),
+    row(-1)
 {
 }
 
@@ -14,7 +15,7 @@ void addThemeCommand::undo() {
 }
 
 void addThemeCommand::redo() {
-    if(!S_PROJECT->addTheme(theme_title, theme_alias))
+    if(!S_PROJECT->addTheme(theme_title, theme_alias, row))
         return;
 
     theme_alias = S_PROJECT->themeAlias(theme_title);
@@ -25,16 +26,18 @@ void addThemeCommand::redo() {
 removeThemeCommand::removeThemeCommand(const QString &alias, QUndoCommand *parent) :
     QUndoCommand(parent),
     theme_alias(alias),
-    theme_title("")
+    theme_title(""),
+    row(S_PROJECT->themeRow(alias))
 {
 }
 
 void removeThemeCommand::undo() {
-    S_PROJECT->addTheme(theme_title, theme_alias);
+    S_PROJECT->addTheme(theme_title, theme_alias, row);
 }
 
 void removeThemeCommand::redo() {
     theme_title = S_PROJECT->themeTitle(theme_alias);
+    row = S_PROJECT->themeRow(theme_alias);
     S_PROJECT->removeTheme(theme_alias);
     setText(QString(QObject::tr("Theme removed: %1"))
             .arg(theme_title));

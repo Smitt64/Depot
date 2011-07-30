@@ -4,6 +4,9 @@
 #include <QFileInfo>
 #include <QPluginLoader>
 #include <QStandardItem>
+#include <QXmlQuery>
+#include <QBuffer>
+#include <QXmlFormatter>
 #include "defaulttesttypes/default_tst_types.h"
 
 SProject::SProject(QObject *parent) :
@@ -82,24 +85,109 @@ bool SProject::create(const QString &filename) {
     temp_handle->archFName = QString("%1/%2").arg(QDir::tempPath(), QFileInfo(filename).fileName());
     FileSystem::getInst()->fsCreate(temp_handle->archFName, temp_handle);
 
-    QDomDocument document("test");
+    QDomDocument document("DepotTest");
     QDomElement test = document.createElement("test");
     test.setAttribute("version", "depot1");
+
+    QDomElement themes = document.createElement("themes");
+    themes.appendChild(document.createTextNode("theme1"));
+    test.appendChild(themes);
+    document.appendChild(test);
 
     QByteArray data;
     QTextStream stream(&data);
     document.save(stream, 3);
 
-    if(!addData(data, "questions.xml"))
+    if(!FileSystem::getInst()->fsOpen(file_handle))
         return false;
+    if(!FileSystem::getInst()->fsAddFile(data,"questions.xml", file_handle)) {
+        FileSystem::getInst()->fsClose(file_handle);
+        return false;
+    }
+
+    FileSystem::getInst()->fsClose(file_handle);
 
     return true;
 }
 
 bool SProject::openProject(const QString &filename) {
-    bool hr = FileSystem::getInst()->fsOpen(filename, file_handle);
+    if(file_handle)
+        SAFE_DELETE(file_handle);
+    file_handle = new FSHANDLE;
+    file_handle->archFName = filename;
+
+    bool hr = FileSystem::getInst()->fsOpen(file_handle);
+
+    if(!hr) {
+        FileSystem::getInst()->fsClose(file_handle);
+        return false;
+    }
     FileSystem::getInst()->fsClose(file_handle);
+
+    temp_handle->archFName = QString("%1/%2").arg(QDir::tempPath(), QFileInfo(filename).fileName());
+    FileSystem::getInst()->fsCreate(temp_handle->archFName, temp_handle);
+
+    QByteArray data = readData("questions.xml");
+    qDebug() << data;
+    /*QBuffer file(&data);
+    file.open(QIODevice::ReadOnly);
+    QString themes;
+    xmlQuery.bindVariable("document", &file);
+    xmlQuery.setQuery("doc($document)/test/themes/theme/title=\"{@title}\"/>");
+
+    xmlQuery.evaluateTo(&themes);
+
+    qDebug() << themes;*/
+    QDomDocument document;
+    if(!document.setContent(data))
+        return false;
+    QDomElement documentElement = document.documentElement();
+    QDomElement themesElement = documentElement.firstChildElement("themes");
+    for(QDomNode n = themesElement.firstChild(); !n.isNull(); n = n.nextSibling()) {
+        QDomElement element = n.toElement();
+        addTheme(element.attribute("title"),
+                 element.attribute("alias", ""),
+                 element.attribute("row", "-1").toInt());
+    }
     return hr;
+}
+
+bool SProject::saveProject() {
+    if(!FileSystem::getInst()->fsOpen(temp_handle)) {
+        FileSystem::getInst()->fsClose(temp_handle);
+        return false;
+    }
+
+    foreach (File file, temp_handle->fileList) {
+        if(!FileSystem::getInst()->fsOpen(file_handle)) {
+            FileSystem::getInst()->fsClose(file_handle);
+            continue;
+        }
+        QString str = QString(file.m_pName);
+        QByteArray data = FileSystem::getInst()->fsGetFile(str, temp_handle);
+        if(data.isNull()) {
+            FileSystem::getInst()->fsClose(file_handle);
+            continue;
+        }
+        qDebug() << data;
+        if(!FileSystem::getInst()->fsHasFile(str, file_handle))
+            FileSystem::getInst()->fsAddFile(data, str, file_handle);
+        else
+            FileSystem::getInst()->fsRewriteFile(data, str, file_handle, 2);
+        FileSystem::getInst()->fsDelete(str, temp_handle);
+        FileSystem::getInst()->fsClose(file_handle);
+    }
+    FileSystem::getInst()->fsClose(temp_handle);
+
+
+
+    /*if(!FileSystem::getInst()->fsOpen(file_handle)) {
+        FileSystem::getInst()->fsClose(file_handle);
+        return false;
+    }
+    FileSystem::getInst()->fsRewriteFile(buf, "questions.xml", file_handle, 2);
+    FileSystem::getInst()->fsClose(file_handle);*/
+    return true;
 }
 
 QByteArray SProject::readData(const QString &filename) {
@@ -130,7 +218,11 @@ bool SProject::addData(QByteArray s_data, const QString &filename) {
     if(!FileSystem::getInst()->fsOpen(temp_handle))
         return false;
 
-    bool hr = FileSystem::getInst()->fsAddFile(s_data, filename, temp_handle);
+    bool hr;
+    if(!FileSystem::getInst()->fsHasFile(filename, temp_handle))
+        hr = FileSystem::getInst()->fsAddFile(s_data, filename, temp_handle);
+    else
+        hr = FileSystem::getInst()->fsRewriteFile(s_data, filename, temp_handle, 2);
     FileSystem::getInst()->fsClose(temp_handle);
     return hr;
 }
@@ -142,6 +234,7 @@ QUndoStack *SProject::undoStack() {
 void SProject::close() {
     undo_stack->clear();
     file_handle->file.close();
+    QFile::remove(file_handle->archFName);
 }
 
 bool SProject::containsTheme(const QString &title) {
@@ -152,7 +245,7 @@ bool SProject::containsTheme(const QString &title) {
     return false;
 }
 
-bool SProject::addTheme(const QString &title, const QString &alias) {
+bool SProject::addTheme(const QString &title, const QString &alias, const int &index) {
     if(containsTheme(title))
         return false;
 
@@ -163,16 +256,22 @@ bool SProject::addTheme(const QString &title, const QString &alias) {
     th->name = title;
     th->alias = (alias.isEmpty() ? QString("theme_%1")
             .arg(thmes_counter) : alias);
+
+    int row = (index == -1 ? themes_model->rowCount() : index);
+    th->row = row;
+
     if(themes.contains(th->alias))
         return false;
 
     themes.insert(th->alias, th);
+    addData(writeXMLConfig(), "questions.xml");
 
-    int row = themes_model->rowCount();
     themes_model->insertRow(row);
     themes_model->setData(themes_model->index(row, 0), title, Qt::DisplayRole);
     themes_model->setData(themes_model->index(row, 0), title, Qt::CheckStateRole);
     themes_model->setData(themes_model->index(row, 1), th->alias, Qt::DisplayRole);
+
+
 
     emit themeAdded(th->name, th->alias);
 
@@ -194,14 +293,18 @@ QString SProject::themeTitle(const QString &alias) {
     return QString::null;
 }
 
+int SProject::themeRow(const QString &alias) {
+    if(themes.contains(alias))
+        return themes[alias]->row;
+    return -1;
+}
+
 void SProject::removeTheme(const QString &alias) {
     if(themes.contains(alias))
     {
-        for(int i = 0; i < themes_model->rowCount(); i++) {
-            if(themes_model->item(i, 1)->text() == alias)
-                themes_model->removeRow(i);
-        }
+        themes_model->removeRow(themes[alias]->row);
         themes.remove(alias);
+        addData(writeXMLConfig(), "questions.xml");
         emit themeRemoved(alias);
     }
 }
@@ -225,14 +328,36 @@ int *SProject::resourceCounter() {
 QuestEditorInterface *SProject::questEditing(QString name) {
     for(int i = 0; i < quest_types->rowCount(); i++) {
         QString str = quest_types->data(quest_types->index(i, 1)).toString();
-                //->item(i, 1)->text();
         if(str == name)
             return testTypesPlugins[quest_types->data(quest_types->index(i, 2)).toInt()]->editor();
-                    //quest_types->item(i, 2)->text().toInt()]->editor();
     }
     return NULL;
 }
 
 QStandardItemModel *SProject::themesModel() {
     return themes_model;
+}
+
+QByteArray SProject::writeXMLConfig() {
+    QByteArray res;
+    QDomDocument document("DepotTest");
+    QDomElement test = document.createElement("test");
+    test.setAttribute("version", "depot1");
+
+    QDomElement themesElement = document.createElement("themes");
+
+    foreach (theme *th, themes) {
+        QDomElement themeElement = document.createElement("theme");
+        themeElement.setAttribute("title", th->name);
+        themeElement.setAttribute("alias", th->alias);
+        themeElement.setAttribute("row", th->row);
+        themesElement.appendChild(themeElement);
+    }
+    test.appendChild(themesElement);
+    document.appendChild(test);
+
+    QTextStream stream(&res);
+    document.save(stream, 3);
+
+    return res;
 }

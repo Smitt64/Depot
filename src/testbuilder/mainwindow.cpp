@@ -66,6 +66,8 @@ MainWindow::MainWindow(QWidget *parent) :
     hview->resizeSection(0, 140);
 
     QAction *create = action("new");
+    QAction *open = action("open");
+    QAction *save = action("save");
     QAction *close = action("close");
 
     close->setEnabled(false);
@@ -75,6 +77,8 @@ MainWindow::MainWindow(QWidget *parent) :
     restore();
 
     connect(create, SIGNAL(triggered()), this, SLOT(createProject()));
+    connect(open, SIGNAL(triggered()), this, SLOT(openProject()));
+    connect(save, SIGNAL(triggered()), this, SLOT(saveProject()));
     connect(close, SIGNAL(triggered()), this, SLOT(closeProject()));
 
     connect(add_theme, SIGNAL(triggered()), this, SLOT(addTheme()));
@@ -114,6 +118,10 @@ void MainWindow::createProject() {
     updateTestStruct();
 }
 
+void MainWindow::saveProject() {
+    S_PROJECT->saveProject();
+}
+
 void MainWindow::updateTestStruct() {
     QTreeWidgetItem *top = new QTreeWidgetItem;
     top->setIcon(0, QIcon(":/book"));
@@ -127,6 +135,7 @@ void MainWindow::updateTestStruct() {
 }
 
 void MainWindow::closeProject() {
+    S_PROJECT->close();
     SApplication::inst()->writeSettings("window/tst_struct_header", tst_struct->header()->saveState());
     tst_struct->clear();
     tst_struct->setEnabled(false);
@@ -206,4 +215,24 @@ void MainWindow::addQuestion() {
     EditQuestionDlg *dlg = new EditQuestionDlg(this);
 
     dlg->exec();
+}
+
+void MainWindow::openProject() {
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Opening test..."),
+                                                    "", tr("Test files (*.tst)"));
+
+    if(fileName.isEmpty() )
+        return;
+
+    setWindowFilePath(fileName);
+    commandsHistory->setStack(S_PROJECT->undoStack());
+    commandsHistory->setEnabled(true);
+    tst_struct->setEnabled(true);
+    action("close")->setEnabled(true);
+    action("add_theme")->setEnabled(true);
+    action("add_quest")->setEnabled(true);
+
+    updateTestStruct();
+
+    S_PROJECT->openProject(fileName);
 }

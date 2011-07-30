@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QUndoStack>
 #include <QStandardItemModel>
+#include <QXmlQuery>
 #include "sapplication.h"
 #include "commands.h"
 #include "questionsmodel.h"
@@ -20,6 +21,7 @@ typedef struct {
 typedef struct {
     QString name;
     QString alias;
+    int row;
 }theme;
 
 class SProject : public QObject
@@ -35,7 +37,6 @@ public:
     void setRedactorMode(bool value);
 
     bool create(const QString &filename);
-    bool openProject(const QString &filename);
     void close();
     QByteArray readData(const QString &filename);
     bool addData(QByteArray s_data, const QString &filename);
@@ -43,9 +44,10 @@ public:
     QUndoStack *undoStack();
 
     bool containsTheme(const QString &title);
-    bool addTheme(const QString &title, const QString &alias = "");
+    bool addTheme(const QString &title, const QString &alias = "", const int &index = -1);
     QString themeAlias(const QString &title);
     QString themeTitle(const QString &alias);
+    int themeRow(const QString &alias);
     void removeTheme(const QString &alias);
     void decrimentTheme();
 
@@ -62,8 +64,11 @@ signals:
     void themeRemoved(QString alias);
 
 public slots:
+    bool openProject(const QString &filename);
+    bool saveProject();
 
 private:
+    QByteArray writeXMLConfig();
     bool redactor_mode;
     FSHANDLE *file_handle, *temp_handle;
     QUndoStack *undo_stack;
@@ -73,6 +78,7 @@ private:
     QStandardItemModel *quest_types;
     QStandardItemModel *themes_model;
     int thmes_counter, res_counter;
+    QXmlQuery xmlQuery;
 };
 
 #endif // SPROJECT_H

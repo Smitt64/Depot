@@ -16,12 +16,7 @@ EditQuestionDlg::EditQuestionDlg(QWidget *parent) :
     quest_type->setModel(S_PROJECT->questTypes());
 
     groups_box = new SComboBox(S_PROJECT->themesModel());
-    //groups_box->setModel(S_PROJECT->themesModel());
     groups_box->setWhatsThis(tr("List of groups in which it is necessary to add a question."));
-
-    /*model = new QStandardItemModel;
-    model->setColumnCount(2);
-    model->setHeaderData(0, Qt::Horizontal, "Theme", "Alias");*/
 
     form = new QFormLayout;
     form->addRow(tr("Question type: "), quest_type);

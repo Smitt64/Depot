@@ -5,7 +5,7 @@
 SComboBox::SComboBox(QAbstractItemModel *item_model, QWidget *parent) :
     QComboBox(parent),
     skipNextHide(false),
-    str("ghf")
+    str("")
 {
     setModel(item_model);
     setView(new QListView(this));
@@ -28,7 +28,7 @@ bool SComboBox::eventFilter(QObject* object, QEvent* event) {
         str = "";
         for(int i = 0; i < model()->rowCount(); i++) {
             if(model()->data(model()->index(i, 0), Qt::CheckStateRole).toInt() == Qt::Checked)
-                str += model()->data(model()->index(i, 0)).toString() + "; ";
+                str += model()->data(model()->index(i, 0)).toString() + ";";
         }
             skipNextHide = true;
     }

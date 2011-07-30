@@ -16,6 +16,8 @@ signals:
 private slots:
     void createProject();
     void closeProject();
+    void openProject();
+    void saveProject();
     void addTheme();
     void removeTheme();
     void editTheme();

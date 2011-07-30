@@ -1,5 +1,5 @@
 ﻿CONFIG += qt
-QT += xml sql
+QT += xml sql xmlpatterns
 TEMPLATE = lib
 CONFIG += dll
 

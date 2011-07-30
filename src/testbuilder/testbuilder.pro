@@ -1,4 +1,4 @@
-QT += sql xml
+QT += sql xml xmlpatterns
 
 TARGET = TestBuilder
 TEMPLATE = app

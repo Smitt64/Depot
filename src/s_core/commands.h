@@ -12,6 +12,7 @@ public:
 
 private:
     QString theme_title, theme_alias;
+    int row;
 };
 
 class removeThemeCommand : public QUndoCommand
@@ -23,6 +24,7 @@ public:
 
 private:
     QString theme_title, theme_alias;
+    int row;
 };
 
 #endif // COMMAND_H
