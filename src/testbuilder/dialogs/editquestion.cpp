@@ -24,8 +24,8 @@ EditQuestionDlg::EditQuestionDlg(QWidget *parent) :
 
     layout = new QVBoxLayout;
     layout->addLayout(form);
-    layout->addWidget((QWidget*)
-                      S_PROJECT->questEditing(((QStandardItemModel*)(quest_type->model()))->item(quest_type->currentIndex(), 1)->text()));
+    editor = S_PROJECT->questEditing(((QStandardItemModel*)(quest_type->model()))->item(quest_type->currentIndex(), 1)->text());
+    layout->addWidget((QWidget*)editor);
     layout->addWidget(buttons);
 
     setLayout(layout);
@@ -41,6 +41,13 @@ EditQuestionDlg::~EditQuestionDlg() {
     SAFE_DELETE(buttons);
 }
 
-void EditQuestionDlg::questTypeChanged(int index) {
+void EditQuestionDlg::addResourceFromRedactor(QString name, QByteArray data) {
+    S_PROJECT->addData(data, name);
+}
 
+void EditQuestionDlg::questTypeChanged(int index) {
+    layout->removeWidget(editor);
+    SAFE_DELETE(editor);
+    editor = S_PROJECT->questEditing(((QStandardItemModel*)(quest_type->model()))->item(index, 1)->text());
+    layout->insertWidget(1, editor);
 }

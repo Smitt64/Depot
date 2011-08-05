@@ -22,6 +22,7 @@ public:
 
 private slots:
     void questTypeChanged(int index);
+    void addResourceFromRedactor(QString name, QByteArray data);
 
 private:
     QDialogButtonBox  *buttons;
@@ -31,7 +32,7 @@ private:
     QPushButton *cancel;
     QFormLayout *form;
     QBoxLayout *layout;
-    QuestEditorInterface *tab1;
+    QuestEditorInterface *editor;
 };
 
 #endif // EDITQUESTION_H

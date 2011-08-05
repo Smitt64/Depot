@@ -26,5 +26,24 @@ public:
     virtual QuestEditorInterface *editor();
 };
 //////////////////////////////////////////////////////////////////////////////////////////
+class FreeChouseEditor : QuestEditorInterface
+{
+public:
+    FreeChouseEditor();
+
+    virtual void getResource(int id, QString *name, QByteArray *data);
+    virtual int getResCount();
+    virtual void makeQuestion(QAbstractItemModel *questions);
+
+private:
+    STextEditorView *text_editor;
+};
+
+class FreeChouse_Question : public TestType_Interface
+{
+public:
+    virtual QStandardItem *questinfo();
+    virtual QuestEditorInterface *editor();
+};
 
 #endif // DEFAULT_TST_TYPES_H

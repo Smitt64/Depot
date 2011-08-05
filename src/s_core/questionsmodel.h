@@ -2,6 +2,7 @@
 #define QUESTIONSMODEL_H
 
 #include <QStandardItemModel>
+#include <QDomElement>
 
 class QuestionsModel : public QStandardItemModel
 {
@@ -10,7 +11,13 @@ public:
     QuestionsModel(QObject *parent = 0);
     ~QuestionsModel();
 
+    QDomElement questionData(QString name);
+    QModelIndex questionIndex(QString name);
+    QString questionType(QString name);
+
 signals:
+    void error(QString msg);
+    void warning(QString msg);
 
 public slots:
 

@@ -71,8 +71,9 @@ void EditThemeDlg::captionChanged(const QString &text) {
     if((theme_caption->text() != old_title || theme_alias->text() != old_alias) &&
             theme_caption->text().length() > 0 && theme_alias->text().length() > 0)
         save_changes->setEnabled(true);
-    else
+    else {
         save_changes->setEnabled(false);
+    }
 }
 
 bool EditThemeDlg::isTitleChanged() {

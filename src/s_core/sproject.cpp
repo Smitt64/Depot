@@ -7,6 +7,7 @@
 #include <QXmlQuery>
 #include <QBuffer>
 #include <QXmlFormatter>
+#include <QDebug>
 #include "defaulttesttypes/default_tst_types.h"
 
 SProject::SProject(QObject *parent) :
@@ -25,7 +26,7 @@ SProject::SProject(QObject *parent) :
     quest_types->setHeaderData(1, Qt::Horizontal, tr("Name"));
     quest_types->setHeaderData(2, Qt::Horizontal, tr("Plugin"));
 
-    //
+    //Adding new question type
     TestType_Interface *closed_interface = new Closed_Question;
     testTypesPlugins.push_back(closed_interface);
     QStandardItem *item = testTypesPlugins.last()->questinfo();
@@ -33,6 +34,13 @@ SProject::SProject(QObject *parent) :
     quest_types->setData(quest_types->index(0, 0), item->child(0)->text());
     quest_types->setData(quest_types->index(0, 1), item->child(1)->text());
     quest_types->setData(quest_types->index(0, 2), QVariant(0));
+    //
+    testTypesPlugins.push_back(new FreeChouse_Question);
+    QStandardItem *item2 = testTypesPlugins.last()->questinfo();
+    quest_types->insertRow(1);
+    quest_types->setData(quest_types->index(1, 0), item2->child(0)->text());
+    quest_types->setData(quest_types->index(1, 1), item2->child(1)->text());
+    quest_types->setData(quest_types->index(1, 2), QVariant(1));
 
     themes_model = new QStandardItemModel;
     themes_model->setColumnCount(2);
@@ -129,15 +137,12 @@ bool SProject::openProject(const QString &filename) {
 
     QByteArray data = readData("questions.xml");
     qDebug() << data;
-    /*QBuffer file(&data);
+    QBuffer file(&data);
     file.open(QIODevice::ReadOnly);
-    QString themes;
+
     xmlQuery.bindVariable("document", &file);
-    xmlQuery.setQuery("doc($document)/test/themes/theme/title=\"{@title}\"/>");
 
-    xmlQuery.evaluateTo(&themes);
-
-    qDebug() << themes;*/
+    //qDebug() << themes;
     QDomDocument document;
     if(!document.setContent(data))
         return false;
@@ -145,6 +150,11 @@ bool SProject::openProject(const QString &filename) {
     QDomElement themesElement = documentElement.firstChildElement("themes");
     for(QDomNode n = themesElement.firstChild(); !n.isNull(); n = n.nextSibling()) {
         QDomElement element = n.toElement();
+        QString node;
+        xmlQuery.setQuery(QString("doc($document)/test/themes/theme[@alias=\"%1\"]")
+                          .arg(element.attribute("alias")));
+        xmlQuery.evaluateTo(&node);
+
         addTheme(element.attribute("title"),
                  element.attribute("alias", ""),
                  element.attribute("row", "-1").toInt());
@@ -169,7 +179,6 @@ bool SProject::saveProject() {
             FileSystem::getInst()->fsClose(file_handle);
             continue;
         }
-        qDebug() << data;
         if(!FileSystem::getInst()->fsHasFile(str, file_handle))
             FileSystem::getInst()->fsAddFile(data, str, file_handle);
         else
@@ -178,15 +187,6 @@ bool SProject::saveProject() {
         FileSystem::getInst()->fsClose(file_handle);
     }
     FileSystem::getInst()->fsClose(temp_handle);
-
-
-
-    /*if(!FileSystem::getInst()->fsOpen(file_handle)) {
-        FileSystem::getInst()->fsClose(file_handle);
-        return false;
-    }
-    FileSystem::getInst()->fsRewriteFile(buf, "questions.xml", file_handle, 2);
-    FileSystem::getInst()->fsClose(file_handle);*/
     return true;
 }
 
@@ -271,8 +271,6 @@ bool SProject::addTheme(const QString &title, const QString &alias, const int &i
     themes_model->setData(themes_model->index(row, 0), title, Qt::CheckStateRole);
     themes_model->setData(themes_model->index(row, 1), th->alias, Qt::DisplayRole);
 
-
-
     emit themeAdded(th->name, th->alias);
 
     return true;
@@ -326,6 +324,7 @@ int *SProject::resourceCounter() {
 }
 
 QuestEditorInterface *SProject::questEditing(QString name) {
+    qDebug() << name;
     for(int i = 0; i < quest_types->rowCount(); i++) {
         QString str = quest_types->data(quest_types->index(i, 1)).toString();
         if(str == name)
@@ -338,7 +337,7 @@ QStandardItemModel *SProject::themesModel() {
     return themes_model;
 }
 
-QByteArray SProject::writeXMLConfig() {
+QByteArray SProject::writeXMLConfig(QDomElement question) {
     QByteArray res;
     QDomDocument document("DepotTest");
     QDomElement test = document.createElement("test");

@@ -2,6 +2,7 @@
 #define SPROJECT_H
 
 #include <QObject>
+#include <QDomElement>
 #include <QUndoStack>
 #include <QStandardItemModel>
 #include <QXmlQuery>
@@ -68,7 +69,7 @@ public slots:
     bool saveProject();
 
 private:
-    QByteArray writeXMLConfig();
+    QByteArray writeXMLConfig(QDomElement question = QDomElement());
     bool redactor_mode;
     FSHANDLE *file_handle, *temp_handle;
     QUndoStack *undo_stack;
