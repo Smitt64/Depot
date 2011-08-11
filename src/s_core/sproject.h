@@ -10,7 +10,7 @@
 #include "commands.h"
 #include "questionsmodel.h"
 #include "interfaces/testtype_interface.h"
-#include "interfaces/questeditor_interface.h"
+#include "interfaces/questeditor_interface.hpp"
 
 #define S_PROJECT ((SProject*)(SApplication::inst()->project()))
 
@@ -45,12 +45,20 @@ public:
     QUndoStack *undoStack();
 
     bool containsTheme(const QString &title);
-    bool addTheme(const QString &title, const QString &alias = "", const int &index = -1);
+    bool addTheme(const QString &title, const QString &alias = QString(), const int &index = -1);
     QString themeAlias(const QString &title);
     QString themeTitle(const QString &alias);
     int themeRow(const QString &alias);
     void removeTheme(const QString &alias);
     void decrimentTheme();
+
+    bool addQuestion(const QString &type, const QString &name,
+                     const QByteArray &settings, QString label = QString());
+    void removeQuestion(const QString &name);
+
+    int questionsInType(QString typeName);
+    int questionsCount();
+    int numberForQuestion();
 
     int *resourceCounter();
 
@@ -58,18 +66,20 @@ public:
     QStandardItemModel *questTypes();
     QStandardItemModel *themesModel();
 
-    QuestEditorInterface *questEditing(QString name);
+    QuestEditorInterface *questEditing(const QString &name);
 
 signals:
     void themeAdded(QString title, QString alias);
     void themeRemoved(QString alias);
+    void error(QString msg);
 
 public slots:
     bool openProject(const QString &filename);
     bool saveProject();
 
 private:
-    QByteArray writeXMLConfig(QDomElement question = QDomElement());
+    QByteArray writeXMLConfig(const QDomElement &questionConf = QDomElement());
+    QModelIndex questTypeIndex(const QString &typeName);
     bool redactor_mode;
     FSHANDLE *file_handle, *temp_handle;
     QUndoStack *undo_stack;
@@ -78,7 +88,7 @@ private:
     QuestionsModel *quest_model;
     QStandardItemModel *quest_types;
     QStandardItemModel *themes_model;
-    int thmes_counter, res_counter;
+    int thmes_counter, res_counter, quest_counter;
     QXmlQuery xmlQuery;
 };
 

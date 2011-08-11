@@ -14,7 +14,8 @@ SProject::SProject(QObject *parent) :
     QObject(parent),
     file_handle(NULL),
     thmes_counter(0),
-    res_counter(0)
+    res_counter(0),
+    quest_counter(0)
 {
     temp_handle = new FSHANDLE;
     undo_stack = new QUndoStack(this);
@@ -142,7 +143,6 @@ bool SProject::openProject(const QString &filename) {
 
     xmlQuery.bindVariable("document", &file);
 
-    //qDebug() << themes;
     QDomDocument document;
     if(!document.setContent(data))
         return false;
@@ -323,8 +323,7 @@ int *SProject::resourceCounter() {
     return (int*)&res_counter;
 }
 
-QuestEditorInterface *SProject::questEditing(QString name) {
-    qDebug() << name;
+QuestEditorInterface *SProject::questEditing(const QString &name) {
     for(int i = 0; i < quest_types->rowCount(); i++) {
         QString str = quest_types->data(quest_types->index(i, 1)).toString();
         if(str == name)
@@ -337,7 +336,7 @@ QStandardItemModel *SProject::themesModel() {
     return themes_model;
 }
 
-QByteArray SProject::writeXMLConfig(QDomElement question) {
+QByteArray SProject::writeXMLConfig(const QDomElement &question) {
     QByteArray res;
     QDomDocument document("DepotTest");
     QDomElement test = document.createElement("test");
@@ -359,4 +358,71 @@ QByteArray SProject::writeXMLConfig(QDomElement question) {
     document.save(stream, 3);
 
     return res;
+}
+
+QModelIndex SProject::questTypeIndex(const QString &typeName) {
+    QList<QStandardItem*> items = quest_types->findItems(typeName, Qt::MatchCaseSensitive, 1);
+
+    if(items.count() == 0)
+        return QModelIndex();
+
+    return items[0]->index();
+}
+
+int SProject::questionsInType(QString typeName) {
+    QList<QStandardItem*> items = quest_model->findItems(typeName, Qt::MatchCaseSensitive, 2);
+
+    return items.count();
+}
+
+int SProject::questionsCount() {
+    return quest_model->rowCount();
+}
+
+int SProject::numberForQuestion() {
+    return quest_counter;
+}
+
+bool SProject::addQuestion(const QString &type, const QString &name,
+                           const QByteArray &settings, QString label) {
+    if(quest_model->hasQuestion(name))
+        return false;
+
+    QDomDocument doc;
+    QString errMsg;
+    if(!doc.setContent(settings, &errMsg)) {
+        error(tr("Quest configuration invalid!"
+                 "%1").arg(errMsg));
+        return false;
+    }
+
+    label = (label.isNull() ? name : label);
+    if(questTypeIndex(type).isValid()) {
+        error(tr("Question type [%1] is not exists!").arg(name));
+        return false;
+    }
+
+    QString complete_name = QString("%1_%2")
+            .arg(name)
+            .arg(quest_counter);
+
+    if(quest_model->questionIndex(complete_name).isValid()) {
+        error(tr("Question [%1] allready exists!").arg(complete_name));
+        return false;
+    }
+
+    quest_model->addQuestion(type, complete_name, settings, label);
+
+    return true;
+}
+
+void SProject::removeQuestion(const QString &name) {
+    QModelIndex index = quest_model->questionIndex(name);
+    if(!index.isValid()) {
+        error(tr("Can't remove question [%1]").arg(name));
+        return;
+    }
+
+    int row = index.row();
+    quest_model->removeRow(row);
 }
