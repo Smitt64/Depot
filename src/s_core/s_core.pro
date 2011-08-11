@@ -20,10 +20,10 @@ HEADERS = sapplication.h \
     stexteditor.h \
     scustomizedlg.h \
     stoolbar.h \
-    interfaces/questeditor_interface.h \
     interfaces/testtype_interface.h \
     defaulttesttypes/default_tst_types.h \
-    scombobox.h
+    scombobox.h \
+    interfaces/questeditor_interface.hpp
 
 SOURCES = sapplication.cpp \
           cmainwindow.cpp \

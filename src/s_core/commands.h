@@ -27,4 +27,19 @@ private:
     int row;
 };
 
+
+class addQuestionCommand : public QUndoCommand
+{
+public:
+    addQuestionCommand(const QString &type, const QString &alias,
+                       const QByteArray &settings, const QString &label,
+                       QUndoCommand *parent = 0);
+    void undo();
+    void redo();
+
+private:
+    QString quest_type, quest_alias, quest_label;
+    QByteArray quest_settings;
+};
+
 #endif // COMMAND_H

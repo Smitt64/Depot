@@ -46,3 +46,14 @@ void SComboBox::paintEvent(QPaintEvent *e) {
     style()->drawComplexControl(QStyle::CC_ComboBox, &option, &painter, this);
     style()->drawControl(QStyle::CE_ComboBoxLabel, &option, &painter, this);
 }
+
+int SComboBox::selectedItemsCount() {
+    QAbstractItemModel *tmodel = model();
+    int count = 0;
+    for(int i = 0; i < tmodel->rowCount(); i++) {
+        if(tmodel->data(tmodel->index(i, 0), Qt::CheckStateRole).toInt() == Qt::Checked)
+            count ++;
+    }
+
+    return count;
+}

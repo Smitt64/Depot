@@ -11,6 +11,7 @@ public:
 
     bool eventFilter(QObject* object, QEvent* event);
     void hidePopup();
+    int selectedItemsCount();
 
 private:
     QString str;

@@ -7,21 +7,32 @@
 QuestionsModel::QuestionsModel(QObject *parent) :
     QStandardItemModel(parent)
 {
-    setColumnCount(6);
+    setColumnCount(5);
     setHeaderData(0, Qt::Horizontal, tr("Question"));
     setHeaderData(1, Qt::Horizontal, tr("Name"));
     setHeaderData(2, Qt::Horizontal, tr("Question type"));
-    setHeaderData(3, Qt::Horizontal, tr("Data"));
+    setHeaderData(3, Qt::Horizontal, tr("Settings"));
+    setHeaderData(4, Qt::Horizontal, tr("Data"));
 }
 
 QuestionsModel::~QuestionsModel() {
 
 }
 
-QDomElement QuestionsModel::questionData(QString name) {
+QByteArray QuestionsModel::questionData(QString name) {
     QModelIndex index = questionIndex(name);
     if(!index.isValid()) {
         error(tr("Can't obtain the data about a question [%1]").arg(name));
+        return QByteArray();
+    }
+
+    return item(index.row(), 4)->data().toByteArray();
+}
+
+QDomElement QuestionsModel::questionSettings(QString name) {
+    QModelIndex index = questionIndex(name);
+    if(!index.isValid()) {
+        error(tr("Can't obtain question settings [%1]").arg(name));
         return QDomElement();
     }
 
@@ -47,4 +58,19 @@ QModelIndex QuestionsModel::questionIndex(QString name) {
     }
 
     return items[0]->index();
+}
+
+bool QuestionsModel::hasQuestion(QString name) {
+    return questionIndex(name).isValid();
+}
+
+void QuestionsModel::addQuestion(QString type, QString name, QByteArray settings, QString label) {
+    int rows = rowCount();
+    insertRow(rows);
+    rows ++;
+    setData(index(rows, 0), label);
+    setData(index(rows, 1), name);
+    setData(index(rows, 2), type);
+    setData(index(rows, 3), settings);
+    setData(index(rows, 4), QByteArray());
 }

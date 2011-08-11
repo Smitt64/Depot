@@ -42,3 +42,26 @@ void removeThemeCommand::redo() {
     setText(QString(QObject::tr("Theme removed: %1"))
             .arg(theme_title));
 }
+//==================================================================================
+addQuestionCommand::addQuestionCommand(const QString &type, const QString &alias,
+                                       const QByteArray &settings, const QString &label,
+                                       QUndoCommand *parent) :
+    QUndoCommand(parent),
+    quest_type(type),
+    quest_alias(alias),
+    quest_settings(settings),
+    quest_label(label)
+{
+
+}
+
+void addQuestionCommand::undo() {
+    S_PROJECT->removeQuestion(quest_alias);
+}
+
+void addQuestionCommand::redo() {
+    if(!S_PROJECT->addQuestion(quest_type, quest_alias,
+                           quest_settings, quest_label))
+        return;
+    setText(QObject::tr("Question created: %1").arg(quest_alias));
+}

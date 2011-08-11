@@ -2,11 +2,12 @@
 #define TESTTYPE_INTERFACE_H
 
 #include <QStandardItem>
-#include "questeditor_interface.h"
+#include "questeditor_interface.hpp"
 
 class TestType_Interface : public QObject {
     Q_OBJECT
 public:
+    //TestType_Interface(QObject *parent = 0);
     virtual ~TestType_Interface() {}
     /*
       row 1: Type caption;
