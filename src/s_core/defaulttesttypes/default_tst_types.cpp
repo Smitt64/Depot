@@ -1,12 +1,14 @@
 #include "default_tst_types.h"
+#include "../sapplication.h"
 #include <QBoxLayout>
 #include <QTabWidget>
-#include <QPushButton>
 #include <QDebug>
+#include <QTime>
 
 //////////////////////////////////////////////////////////////////////////////////////////
-ClosedTestEditor::ClosedTestEditor() :
-    QuestEditorInterface()
+ClosedTestEditor::ClosedTestEditor(QWidget *parent) :
+    QuestEditorInterface(parent),
+    oldAnswersCount(0)
 {
     text_editor = new STextEditorView;
     QTabWidget *tab = new QTabWidget;
@@ -15,6 +17,112 @@ ClosedTestEditor::ClosedTestEditor() :
     layout->addWidget(tab);
 
     setLayout(layout);
+
+    QWidget *tab2 = new QWidget(this);
+    tab->addTab(tab2, tr("Answers"));
+    QLayout *buttonLayout = new QVBoxLayout;
+    QLayout *answersLayout = new QHBoxLayout;
+
+    addBtn = new QPushButton(tr("Add"), this);
+    editBtn = new QPushButton(tr("Edit"), this);
+    editBtn->setEnabled(false);
+    remBtn = new QPushButton(tr("Remove"), this);
+    remBtn->setEnabled(false);
+
+    QSpacerItem *spacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    buttonLayout->addWidget(addBtn);
+    buttonLayout->addWidget(editBtn);
+    buttonLayout->addWidget(remBtn);
+    buttonLayout->addItem(spacer);
+
+    answers = new QTableWidget(0, 2, this);
+    answers->setSelectionBehavior(QAbstractItemView::SelectRows);
+    answers->setColumnWidth(0, 50);
+    answers->setColumnWidth(1, 400);
+    answers->setHorizontalHeaderLabels(QStringList() << tr("Right")
+                                       << tr("Text"));
+
+    answersLayout->addWidget(answers);
+    answersLayout->addItem(buttonLayout);
+    tab2->setLayout(answersLayout);
+
+    connect(addBtn, SIGNAL(clicked()), this, SLOT(addAnswer()));
+    connect(editBtn, SIGNAL(clicked()), this, SLOT(editAnswer()));
+    connect(remBtn, SIGNAL(clicked()), this, SLOT(removeAnswer()));
+    connect(answers, SIGNAL(cellClicked(int,int)), this, SLOT(updateCheckCell(int,int)));
+    connect(answers, SIGNAL(itemSelectionChanged()), this, SLOT(answerSelectionChanged()));
+    connect(text_editor, SIGNAL(contentChanged()), this, SLOT(validQuestion()));
+}
+
+void ClosedTestEditor::updateCheckCell(int row, int column) {
+    if(column == 0) {
+        QTableWidgetItem *item = answers->item(row, 0);
+        item->setText((item->checkState() == Qt::Checked ? tr("Yes") : tr("No")));
+    }
+}
+
+void ClosedTestEditor::addAnswer() {
+    STextEditor *dlg = new STextEditor((QWidget*)this);
+    if(dlg->exec() == QDialog::Accepted) {
+        QTableWidgetItem *checkItem = new QTableWidgetItem;
+        checkItem->setCheckState(Qt::Unchecked);
+        checkItem->setText(tr("No"));
+        checkItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+
+        QTableWidgetItem *textItem = new QTableWidgetItem;
+        textItem->setTextAlignment(Qt::AlignAbsolute | Qt::AlignVCenter);
+        textItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        textItem->setText(dlg->plainText());
+        textItem->setData(Qt::UserRole, dlg->html());
+
+        int rows = answers->rowCount();
+        answers->insertRow(rows);
+        answers->setItem(rows, 0, checkItem);
+        answers->setItem(rows, 1, textItem);
+    }
+    SAFE_DELETE(dlg);
+    validQuestion();
+}
+
+void ClosedTestEditor::editAnswer() {
+    STextEditor *dlg = new STextEditor((QWidget*)this);
+    int row = answers->currentRow();
+    dlg->setHtml(answers->item(row, 1)->data(Qt::UserRole).toString());
+
+    if(dlg->exec() == QDialog::Accepted) {
+        answers->item(row, 1)->setText(dlg->plainText());
+        answers->item(row, 1)->setData(Qt::UserRole, dlg->html());
+    }
+    SAFE_DELETE(dlg);
+    validQuestion();
+}
+
+void ClosedTestEditor::removeAnswer() {
+    answers->removeRow(answers->currentRow());
+    validQuestion();
+}
+
+void ClosedTestEditor::answerSelectionChanged() {
+    bool enabled = (answers->rowCount() && answers->currentRow() != -1 ? true : false);
+    editBtn->setEnabled(enabled);
+    remBtn->setEnabled(enabled);
+}
+
+void ClosedTestEditor::validQuestion() {
+    if(text_editor->isModified()
+            && answers->rowCount() != oldAnswersCount
+            && answers->rowCount() > 2) {
+        for(int i = 0; i < answers->rowCount(); i++) {
+            if(answers->item(i, 0)->checkState() == Qt::Checked) {
+                emit validationChanged(true);
+                break;
+            }
+        }
+        emit validationChanged(false);
+    }else {
+        emit validationChanged(false);
+    }
 }
 
 void ClosedTestEditor::getResource(int id, QString *name, QByteArray *data) {
@@ -24,9 +132,20 @@ int ClosedTestEditor::getResCount() {
     return 0;
 }
 
-void ClosedTestEditor::makeQuestion(QAbstractItemModel *questions) {
-
+void ClosedTestEditor::makeQuestionConfig(QDomElement *questElement) {
+    //QDomDocument doc;
+    //QDomElement root = doc.createElement("question");
+    //root.setAttribute("type", );
 }
+
+QString ClosedTestEditor::makeQuestionAlias() {
+    return QString("closed_quest");
+}
+
+QString ClosedTestEditor::makeQuestionLabel() {
+    return text_editor->plainText().left(15);
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 QStandardItem *Closed_Question::questinfo() {
     QStandardItem *item = new QStandardItem;
@@ -43,8 +162,8 @@ QuestEditorInterface *Closed_Question::editor() {
 *
 *
 */
-FreeChouseEditor::FreeChouseEditor() :
-    QuestEditorInterface()
+FreeChouseEditor::FreeChouseEditor(QWidget *parent) :
+    QuestEditorInterface(parent)
 {
     /*text_editor = new STextEditorView;
     QTabWidget *tab = new QTabWidget;
@@ -62,9 +181,17 @@ int FreeChouseEditor::getResCount() {
     return 0;
 }
 
-void FreeChouseEditor::makeQuestion(QAbstractItemModel *questions) {
-
+void FreeChouseEditor::makeQuestionConfig(QDomElement *questElement) {
 }
+
+QString FreeChouseEditor::makeQuestionAlias() {
+    return QString();
+}
+
+QString FreeChouseEditor::makeQuestionLabel() {
+    return QString();
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 QStandardItem *FreeChouse_Question::questinfo() {
     QStandardItem *item = new QStandardItem;
@@ -74,6 +201,5 @@ QStandardItem *FreeChouse_Question::questinfo() {
 }
 
 QuestEditorInterface *FreeChouse_Question::editor() {
-    qDebug() << "FreeChouse_Question editor";
     return (QuestEditorInterface*) new FreeChouseEditor();
 }

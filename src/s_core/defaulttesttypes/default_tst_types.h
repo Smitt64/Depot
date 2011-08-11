@@ -3,20 +3,36 @@
 
 #include "../interfaces/testtype_interface.h"
 #include "../stexteditor.h"
+#include <QPushButton>
+#include <QTableWidget>
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
 class ClosedTestEditor : QuestEditorInterface
 {
+    Q_OBJECT
 public:
-    ClosedTestEditor();
+    ClosedTestEditor(QWidget *parent = 0);
 
     virtual void getResource(int id, QString *name, QByteArray *data);
     virtual int getResCount();
-    virtual void makeQuestion(QAbstractItemModel *questions);
+    virtual void makeQuestionConfig(QDomElement *questElement);
+    virtual QString makeQuestionAlias();
+    virtual QString makeQuestionLabel();
+
+private slots:
+    void addAnswer();
+    void editAnswer();
+    void removeAnswer();
+    void updateCheckCell(int row, int column);
+    void answerSelectionChanged();
+    void validQuestion();
 
 private:
     STextEditorView *text_editor;
+    QPushButton *addBtn, *editBtn, *remBtn;
+    QTableWidget *answers;
+    int oldAnswersCount;
 };
 
 class Closed_Question : public TestType_Interface
@@ -29,11 +45,13 @@ public:
 class FreeChouseEditor : QuestEditorInterface
 {
 public:
-    FreeChouseEditor();
+    FreeChouseEditor(QWidget *parent = 0);
 
     virtual void getResource(int id, QString *name, QByteArray *data);
     virtual int getResCount();
-    virtual void makeQuestion(QAbstractItemModel *questions);
+    virtual void makeQuestionConfig(QDomElement *questElement);
+    virtual QString makeQuestionAlias();
+    virtual QString makeQuestionLabel();
 
 private:
     STextEditorView *text_editor;
