@@ -17,7 +17,6 @@ MainWindow::MainWindow(QWidget *parent) :
     tst_struct(NULL),
     theme_item(NULL)
 {
-    //setCentralWidget(view);
     setWindowTitle(tr("TestBuiler"));
     setDockOptions(QMainWindow::VerticalTabs);
     makeFileMenu();
@@ -75,6 +74,10 @@ MainWindow::MainWindow(QWidget *parent) :
     makeServiceMenu();
 
     restore();
+
+    QTableView *table = new QTableView(this);
+    table->setModel(S_PROJECT->questions());
+    setCentralWidget(table);
 
     connect(create, SIGNAL(triggered()), this, SLOT(createProject()));
     connect(open, SIGNAL(triggered()), this, SLOT(openProject()));
@@ -214,7 +217,13 @@ void MainWindow::themeRemoved(QString alias) {
 void MainWindow::addQuestion() {
     EditQuestionDlg *dlg = new EditQuestionDlg(this);
 
-    dlg->exec();
+    if(dlg->exec() == QDialog::Accepted) {
+        QString baseName = dlg->questName();
+        QString label = dlg->questLabel();
+        QString type = dlg->questType();
+        //S_PROJECT->undoStack()->push(new addQuestionCommand(title));
+    }
+    SAFE_DELETE(dlg);
 }
 
 void MainWindow::openProject() {

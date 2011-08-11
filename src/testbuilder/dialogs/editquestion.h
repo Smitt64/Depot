@@ -11,7 +11,7 @@
 #include <QComboBox>
 #include <QTabWidget>
 #include <QStandardItemModel>
-#include "interfaces/questeditor_interface.h"
+#include "interfaces/questeditor_interface.hpp"
 
 class EditQuestionDlg : public QDialog
 {
@@ -20,9 +20,15 @@ public:
     EditQuestionDlg(QWidget *parent = 0);
     ~EditQuestionDlg();
 
+    QString questName();
+    QString questLabel();
+    QString questType();
+    QByteArray questConfig(QString questionName);
+
 private slots:
     void questTypeChanged(int index);
     void addResourceFromRedactor(QString name, QByteArray data);
+    void validQestion(bool isValid);
 
 private:
     QDialogButtonBox  *buttons;
