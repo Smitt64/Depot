@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QToolBar>
 #include <QComboBox>
+#include <QDialogButtonBox>
 #include <QFontComboBox>
 
 class STextEditorView : public QMainWindow
@@ -13,6 +14,18 @@ class STextEditorView : public QMainWindow
     Q_OBJECT
 public:
     explicit STextEditorView(QWidget *parent = 0);
+
+    bool isModified();
+    bool isEmpty();
+    QString html();
+    QString plainText();
+
+signals:
+    void contentChanged();
+
+public slots:
+    void setHtml(QString source);
+    void setText(QString source);
 
 private slots:
     void textAlign(QAction *a);
@@ -45,11 +58,24 @@ class STextEditor : public QDialog
     Q_OBJECT
 public:
     explicit STextEditor(QWidget *parent = 0);
+    QString html();
+    QString plainText();
+
+    void setHtml(QString source);
+    void setText(QString source);
 
 signals:
 
 public slots:
+    void reject();
 
+private slots:
+    void contentChanged();
+
+private:
+    STextEditorView *editor;
+    QDialogButtonBox *buttons;
+    QPushButton *okButton, *cancelButton;
 };
 
 #endif // STEXTEDITOR_H

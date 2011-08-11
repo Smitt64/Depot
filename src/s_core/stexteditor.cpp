@@ -1,6 +1,7 @@
 #include "stexteditor.h"
 #include "sapplication.h"
 #include <QColorDialog>
+#include <QMessageBox>
 
 STextEditorView::STextEditorView(QWidget *parent) :
     QMainWindow(parent)
@@ -73,6 +74,8 @@ STextEditorView::STextEditorView(QWidget *parent) :
     connect(actionTextItalic, SIGNAL(triggered()), this, SLOT(textItalic()));
     connect(actionTextUnderline, SIGNAL(triggered()), this, SLOT(textUnderline()));
     connect(actionTextColor, SIGNAL(triggered()), this, SLOT(textColor()));
+
+    connect(textEdit, SIGNAL(textChanged()), this, SIGNAL(contentChanged()));
 }
 
 void STextEditorView::textAlign(QAction *a) {
@@ -173,9 +176,88 @@ void STextEditorView::textSize(const QString &p) {
         mergeFormatOnWordOrSelection(fmt);
     }
 }
+
+bool STextEditorView::isModified() {
+    return textEdit->document()->isModified();
+}
+
+bool STextEditorView::isEmpty() {
+    return textEdit->document()->isEmpty();
+}
+
+QString STextEditorView::html() {
+    return textEdit->toHtml();
+}
+
+QString STextEditorView::plainText() {
+    return textEdit->toPlainText();
+}
+
+void STextEditorView::setHtml(QString source) {
+    textEdit->setHtml(source);
+}
+
+void STextEditorView::setText(QString source) {
+    textEdit->setPlainText(source);
+}
+
 /////////////////////////////////////////////////////////////////////////
 
 STextEditor::STextEditor(QWidget *parent) :
     QDialog(parent)
 {
+    setWindowTitle(tr("Text editor"));
+    editor = new STextEditorView;
+    buttons = new QDialogButtonBox(this);
+    okButton = buttons->addButton(tr("Ok"), QDialogButtonBox::AcceptRole);
+    okButton->setEnabled(false);
+    cancelButton = buttons->addButton(tr("Cancel"), QDialogButtonBox::RejectRole);
+    QLayout *mainLayout = new QVBoxLayout(this);
+
+    connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
+    connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(editor, SIGNAL(contentChanged()), this, SLOT(contentChanged()));
+
+    mainLayout->addWidget(editor);
+    mainLayout->addWidget(buttons);
+
+    setLayout(mainLayout);
+}
+
+void STextEditor::reject() {
+    if(editor->isModified()) {
+        if(QMessageBox::question(this, tr("Text editor"),
+                                 tr("The document has been modified.\n"
+                                    "Are you shure to discard your changes?"),
+                                 QMessageBox::No | QMessageBox::Discard) == QMessageBox::No)
+            return;
+        else
+            QDialog::reject();
+    }
+    QDialog::reject();
+}
+
+QString STextEditor::html() {
+    return editor->html();
+}
+
+QString STextEditor::plainText() {
+    return editor->plainText();
+}
+
+void STextEditor::setHtml(QString source) {
+    editor->setHtml(source);
+    okButton->setEnabled(editor->isModified());
+}
+
+void STextEditor::setText(QString source) {
+    editor->setText(source);
+    okButton->setEnabled(editor->isModified());
+}
+
+void STextEditor::contentChanged() {
+    if(editor->isModified() && !editor->isEmpty()) {
+        okButton->setEnabled(true);
+    }else
+        okButton->setEnabled(false);
 }
