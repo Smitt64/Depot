@@ -127,9 +127,49 @@
 <context>
     <name>ClosedTestEditor</name>
     <message>
-        <location filename="src/s_core/defaulttesttypes/default_tst_types.cpp" line="11"/>
         <source>Editing question</source>
-        <translation>Редактирование вопроса</translation>
+        <translation type="obsolete">Редактирование вопроса</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/defaulttesttypes/default_tst_types.cpp" line="22"/>
+        <source>Answers</source>
+        <translation>Варианты ответов</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/defaulttesttypes/default_tst_types.cpp" line="26"/>
+        <source>Add</source>
+        <translation>Добавить</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/defaulttesttypes/default_tst_types.cpp" line="27"/>
+        <source>Edit</source>
+        <translation>Правка</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/defaulttesttypes/default_tst_types.cpp" line="29"/>
+        <source>Remove</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/defaulttesttypes/default_tst_types.cpp" line="43"/>
+        <source>Right</source>
+        <translation>Верный</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/defaulttesttypes/default_tst_types.cpp" line="44"/>
+        <source>Text</source>
+        <translation>Текст</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/defaulttesttypes/default_tst_types.cpp" line="61"/>
+        <source>Yes</source>
+        <translation>Да</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/defaulttesttypes/default_tst_types.cpp" line="61"/>
+        <location filename="src/s_core/defaulttesttypes/default_tst_types.cpp" line="70"/>
+        <source>No</source>
+        <translation>Нет</translation>
     </message>
 </context>
 <context>
@@ -146,21 +186,47 @@
 <context>
     <name>EditQuestionDlg</name>
     <message>
-        <location filename="src/testbuilder/dialogs/editquestion.cpp" line="8"/>
+        <location filename="src/testbuilder/dialogs/editquestion.cpp" line="10"/>
         <source>Creating question</source>
         <translation>Создание вопроса</translation>
     </message>
     <message>
         <location filename="src/testbuilder/dialogs/editquestion.cpp" line="13"/>
+        <source>Save</source>
+        <translation>Сохранить</translation>
+    </message>
+    <message>
+        <location filename="src/testbuilder/dialogs/editquestion.cpp" line="15"/>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location filename="src/testbuilder/dialogs/editquestion.cpp" line="16"/>
+        <source>Help</source>
+        <translation>Справка</translation>
+    </message>
+    <message>
+        <location filename="src/testbuilder/dialogs/editquestion.cpp" line="19"/>
         <source>List of accessible questions types.</source>
         <translation>Список доступных типов вопросов.</translation>
+    </message>
+    <message>
+        <location filename="src/testbuilder/dialogs/editquestion.cpp" line="23"/>
+        <source>List of groups in which it is necessary to add a question.</source>
+        <translation>Список групп, в которые необходимо добавить вопрос.</translation>
+    </message>
+    <message>
+        <location filename="src/testbuilder/dialogs/editquestion.cpp" line="27"/>
+        <source>Add to themes:</source>
+        <oldsource>Add to groups:</oldsource>
+        <translation>Добавить в темы:</translation>
     </message>
     <message>
         <source>Editing question</source>
         <translation type="obsolete">Редактирование вопроса</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/dialogs/editquestion.cpp" line="17"/>
+        <location filename="src/testbuilder/dialogs/editquestion.cpp" line="26"/>
         <source>Question type: </source>
         <translation>Тип вопроса: </translation>
     </message>
@@ -226,158 +292,176 @@
     </message>
 </context>
 <context>
+    <name>HelpView</name>
+    <message>
+        <location filename="src/s_core/shelpcontentviewwidget.cpp" line="230"/>
+        <source>Assistant</source>
+        <translation>Асистент</translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="21"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="32"/>
         <source>TestBuiler</source>
         <translation>Редактор тестов</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="27"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="39"/>
         <source>Theme</source>
         <translation>Тема</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="28"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="40"/>
         <source>Add theme</source>
         <translation>Добавить тему</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="29"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="41"/>
         <source>Adding new theme to test...</source>
         <translation>Добавлять тему в тест...</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="32"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="44"/>
         <source>Remove theme</source>
         <translation>Удалить тему</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="33"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="45"/>
         <source>Removing current theme...</source>
         <translation>Удаление выбранной темы...</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="36"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="48"/>
         <source>Edit theme</source>
         <translation>Редактировать тему</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="37"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="49"/>
         <source>Edeting current theme...</source>
         <translation>Изменение текущей темы...</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="40"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="52"/>
         <source>Question</source>
         <translation>Вопрос</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="41"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="53"/>
         <source>Add question</source>
         <translation>Добавить вопрос</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="42"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="54"/>
         <source>Adding new question...</source>
         <oldsource>Adding new question</oldsource>
         <translation>Добавление нового вопроса...</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="45"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="57"/>
         <source>Remove question</source>
         <translation>Удалить вопрос</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="46"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="58"/>
         <source>Removing current question...</source>
         <translation>Удаление текущего вопроса...</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="50"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="62"/>
         <source>&lt;empty&gt;</source>
         <translation>&lt;без изменений&gt;</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="52"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="64"/>
         <source>Changes list</source>
         <translation>Список изменений</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="57"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="69"/>
         <source>Test struct</source>
         <translation>Структура теста</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="62"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="74"/>
         <source>Elements</source>
         <translation>Элементы</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="62"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="74"/>
         <source>Alias</source>
         <translation>Псевдоним</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="93"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="116"/>
         <source>Creating new test...</source>
         <translation>Создание нового тетса...</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="94"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="117"/>
         <source>Test file (*.tst)</source>
         <translation>Файл тестов (*.tst)</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="100"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="123"/>
         <source>Creating error!</source>
         <translation>Ошибка создания!</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="101"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="124"/>
         <source>Can&apos;t create new test!</source>
         <translation>Не удалось создать новый тест!</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="120"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="147"/>
         <source>Test</source>
         <translation>Тест</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="124"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="151"/>
         <source>Themes</source>
         <translation>Темы</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="155"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="183"/>
         <source>Addeting new theme...</source>
         <translation>Добавление новой темы...</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="156"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="184"/>
         <source>Enter caption for new theme:</source>
         <translation>Введите заголовок темы:</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="166"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="194"/>
         <source>Removing theme.</source>
         <translation>Удаление темы.</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="167"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="195"/>
         <source>Are You really want remove theme &apos; %1 &apos;?</source>
         <translation>Вы действительно хотите удалить тему &apos;%1&apos;?</translation>
     </message>
     <message>
-        <location filename="src/testbuilder/mainwindow.cpp" line="189"/>
+        <location filename="src/testbuilder/mainwindow.cpp" line="217"/>
         <source>&lt;P&gt;&lt;B&gt;Theme: &lt;/B&gt;%1&lt;/P&gt;&lt;B&gt;Alias: &lt;/B&gt;%2</source>
         <translation>&lt;P&gt;&lt;B&gt;Тема: &lt;/B&gt;%1&lt;/P&gt;&lt;B&gt;Псевдоним: &lt;/B&gt;%2</translation>
+    </message>
+    <message>
+        <location filename="src/testbuilder/mainwindow.cpp" line="253"/>
+        <source>Opening test...</source>
+        <translation>Открытие теста...</translation>
+    </message>
+    <message>
+        <location filename="src/testbuilder/mainwindow.cpp" line="254"/>
+        <source>Test files (*.tst)</source>
+        <translation>Файлы теста (*.tst)</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="src/s_core/commands.cpp" line="21"/>
+        <location filename="src/s_core/commands.cpp" line="22"/>
         <source>New theme: %1.
 Alias: %2</source>
         <oldsource>New theme: %1. Alias: %2</oldsource>
@@ -385,42 +469,75 @@ Alias: %2</source>
 Псевдоним: %2</translation>
     </message>
     <message>
-        <location filename="src/s_core/commands.cpp" line="39"/>
+        <location filename="src/s_core/commands.cpp" line="42"/>
         <source>Theme removed: %1</source>
         <translation>Удалена тема: %1</translation>
     </message>
     <message>
-        <location filename="src/s_core/defaulttesttypes/default_tst_types.cpp" line="31"/>
+        <location filename="src/s_core/commands.cpp" line="73"/>
+        <source>Question created: %1</source>
+        <translation>Вопрос создан: %1</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/defaulttesttypes/default_tst_types.cpp" line="15"/>
+        <source>Editing question</source>
+        <translation>Редактирование вопроса</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/defaulttesttypes/default_tst_types.cpp" line="152"/>
         <source>Question with variants of answers</source>
         <translation>Вопрос с вариантами ответов</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/defaulttesttypes/default_tst_types.cpp" line="198"/>
+        <source>Free choice</source>
+        <translation>Свободный выбор</translation>
     </message>
 </context>
 <context>
     <name>QuestionsModel</name>
     <message>
-        <location filename="src/s_core/questionsmodel.cpp" line="10"/>
+        <location filename="src/s_core/questionsmodel.cpp" line="11"/>
         <source>Question</source>
         <translation>Вопрос</translation>
     </message>
     <message>
-        <location filename="src/s_core/questionsmodel.cpp" line="11"/>
+        <location filename="src/s_core/questionsmodel.cpp" line="12"/>
         <source>Name</source>
         <translation>Псевдоним</translation>
     </message>
     <message>
-        <location filename="src/s_core/questionsmodel.cpp" line="12"/>
+        <location filename="src/s_core/questionsmodel.cpp" line="13"/>
         <source>Question type</source>
         <translation>Тип вопроса</translation>
     </message>
     <message>
-        <location filename="src/s_core/questionsmodel.cpp" line="13"/>
-        <source>Source file</source>
-        <translation>Текст вопроса</translation>
+        <location filename="src/s_core/questionsmodel.cpp" line="14"/>
+        <source>Settings</source>
+        <translation>Параметры</translation>
     </message>
     <message>
-        <location filename="src/s_core/questionsmodel.cpp" line="14"/>
+        <location filename="src/s_core/questionsmodel.cpp" line="25"/>
+        <source>Can&apos;t obtain the data about a question [%1]</source>
+        <translation>Не удалось получить данные о вопросе [%1]</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/questionsmodel.cpp" line="35"/>
+        <source>Can&apos;t obtain question settings [%1]</source>
+        <translation>Не удалось получить настройки теста [%1]</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/questionsmodel.cpp" line="47"/>
+        <source>Can&apos;t obtain the question type [%1]</source>
+        <translation>Не удалось получить тип вопроса [%1]</translation>
+    </message>
+    <message>
+        <source>Source file</source>
+        <translation type="obsolete">Текст вопроса</translation>
+    </message>
+    <message>
         <source>Answer</source>
-        <translation>Ответ</translation>
+        <translation type="obsolete">Ответ</translation>
     </message>
     <message>
         <location filename="src/s_core/questionsmodel.cpp" line="15"/>
@@ -497,19 +614,39 @@ Alias: %2</source>
 <context>
     <name>SProject</name>
     <message>
-        <location filename="src/s_core/sproject.cpp" line="21"/>
+        <location filename="src/s_core/sproject.cpp" line="26"/>
         <source>Type caption</source>
         <translation>Название</translation>
     </message>
     <message>
-        <location filename="src/s_core/sproject.cpp" line="22"/>
+        <location filename="src/s_core/sproject.cpp" line="27"/>
         <source>Name</source>
         <translation>Псевдоним</translation>
     </message>
     <message>
-        <location filename="src/s_core/sproject.cpp" line="23"/>
+        <location filename="src/s_core/sproject.cpp" line="28"/>
         <source>Plugin</source>
         <translation>Палагин</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/sproject.cpp" line="395"/>
+        <source>Quest configuration invalid!%1</source>
+        <translation>Конфигурация теста содержит ошибки! %1</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/sproject.cpp" line="402"/>
+        <source>Question type [%1] is not exists!</source>
+        <translation>Тип вопроса [%1] не зарегестрирован!</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/sproject.cpp" line="411"/>
+        <source>Question [%1] allready exists!</source>
+        <translation>Вопрос [%1] уже сущесьвует!</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/sproject.cpp" line="424"/>
+        <source>Can&apos;t remove question [%1]</source>
+        <translation>Не удалось удалить вопрос [%1]</translation>
     </message>
     <message>
         <source>Question with variants of answers</source>
@@ -521,11 +658,77 @@ Alias: %2</source>
     </message>
 </context>
 <context>
+    <name>STextEditor</name>
+    <message>
+        <location filename="src/s_core/stexteditor.cpp" line="209"/>
+        <location filename="src/s_core/stexteditor.cpp" line="229"/>
+        <source>Text editor</source>
+        <translation>Редактор текста</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/stexteditor.cpp" line="212"/>
+        <source>Ok</source>
+        <translation>ОК</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/stexteditor.cpp" line="214"/>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/stexteditor.cpp" line="230"/>
+        <source>The document has been modified.
+Are you shure to discard your changes?</source>
+        <translation>Документ был изменен.
+Вы уверены, что хотите отменить внесенные изменения?</translation>
+    </message>
+</context>
+<context>
     <name>STextEditorView</name>
     <message>
-        <location filename="src/s_core/stexteditor.cpp" line="28"/>
+        <location filename="src/s_core/stexteditor.cpp" line="18"/>
         <source>Formating</source>
         <translation>Форматирование</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/stexteditor.cpp" line="26"/>
+        <source>Bold</source>
+        <translation>Жирный</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/stexteditor.cpp" line="31"/>
+        <source>Italic</source>
+        <translation>Наклонный</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/stexteditor.cpp" line="35"/>
+        <source>Underline</source>
+        <translation>Подчеркнутый</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/stexteditor.cpp" line="42"/>
+        <source>Align left</source>
+        <translation>Выравнивание по левому краю</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/stexteditor.cpp" line="46"/>
+        <source>Align center</source>
+        <translation>Выравнивание по центру</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/stexteditor.cpp" line="50"/>
+        <source>Align right</source>
+        <translation>Выравнивание по правому краю</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/stexteditor.cpp" line="54"/>
+        <source>Align justify</source>
+        <translation>Выравнивание по ширине</translation>
+    </message>
+    <message>
+        <location filename="src/s_core/stexteditor.cpp" line="62"/>
+        <source>Font color</source>
+        <translation>Цвет шрифта</translation>
     </message>
 </context>
 </TS>
