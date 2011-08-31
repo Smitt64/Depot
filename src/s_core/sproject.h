@@ -9,21 +9,28 @@
 #include "sapplication.h"
 #include "commands.h"
 #include "questionsmodel.h"
+#include "filesystemobject.h"
 #include "interfaces/testtype_interface.h"
 #include "interfaces/questeditor_interface.hpp"
 
 #define S_PROJECT ((SProject*)(SApplication::inst()->project()))
 
-typedef struct {
+/*typedef struct {
     QString name;
     QString source;
-}question;
+} question;*/
 
 typedef struct {
     QString name;
     QString alias;
+    QStringList questions;
     int row;
-}theme;
+} theme;
+
+typedef struct {
+    QString questionAlias;
+    QString resourceAlias;
+} reg_resource;
 
 class SProject : public QObject
 {
@@ -31,29 +38,38 @@ class SProject : public QObject
     Q_PROPERTY(bool in_redactor_mode READ isRedactorMode WRITE setRedactorMode)
 public:
     explicit SProject(QObject *parent = 0);
+    ~SProject();
 
     void loadPlugins();
-
+    bool isModifyed();
     bool isRedactorMode();
     void setRedactorMode(bool value);
 
     bool create(const QString &filename);
-    void close();
     QByteArray readData(const QString &filename);
     bool addData(QByteArray s_data, const QString &filename);
+    bool hasData(const QString &filename);
 
     QUndoStack *undoStack();
 
-    bool containsTheme(const QString &title);
+    bool containsTheme(const QString &alias);
     bool addTheme(const QString &title, const QString &alias = QString(), const int &index = -1);
     QString themeAlias(const QString &title);
     QString themeTitle(const QString &alias);
+    QStringList themesAliases();
     int themeRow(const QString &alias);
     void removeTheme(const QString &alias);
     void decrimentTheme();
 
+    //Working with questions
     bool addQuestion(const QString &type, const QString &name,
-                     const QByteArray &settings, QString label = QString());
+                     const QByteArray &settings, QStringList toThemes,
+                     QString label = QString());
+    QString questionType(const QString &alias);
+    QString questionTypeLabel(const QString &alias);
+    bool addQuestionToTheme(const QString &themeAlias, const QString &questAlias);
+    bool removeQuestionFromTheme(const QString &questAlias, const QString &themeAlias = QString());
+    bool containsQuestion(const QString &alias);
     void removeQuestion(const QString &name);
 
     int questionsInType(QString typeName);
@@ -68,28 +84,42 @@ public:
 
     QuestEditorInterface *questEditing(const QString &name);
 
+    bool regResource(const QString &questAlias, const QString &qResource);
+    void unregResource(const QString &questAlias, const QString &qResource = QString());
+    QStringList resourcesForQuestion(const QString &questAlias);
+
 signals:
     void themeAdded(QString title, QString alias);
     void themeRemoved(QString alias);
+    void questionAdded(QString alias, QString label, QStringList toThemes);
+    void questionRemoved(QString questAlias, QStringList fromThemes);
+    void modifyChanged(bool value);
     void error(QString msg);
 
 public slots:
     bool openProject(const QString &filename);
+    void close();
     bool saveProject();
 
 private:
     QByteArray writeXMLConfig(const QDomElement &questionConf = QDomElement());
     QModelIndex questTypeIndex(const QString &typeName);
+    //int fileArchive(const QString &filename);
+    //bool moveData(const QString &filename, int from = 1, int to = 0);
+    int canClose();
+
     bool redactor_mode;
-    FSHANDLE *file_handle, *temp_handle;
+    //FSHANDLE *file_handle, *temp_handle;
     QUndoStack *undo_stack;
     QMap<QString, theme*> themes;
+    QList<reg_resource*> registered_resources;
     QList<TestType_Interface*> testTypesPlugins;
     QuestionsModel *quest_model;
     QStandardItemModel *quest_types;
     QStandardItemModel *themes_model;
     int thmes_counter, res_counter, quest_counter;
     QXmlQuery xmlQuery;
+    FileSystemObject *fsManager;
 };
 
 #endif // SPROJECT_H
