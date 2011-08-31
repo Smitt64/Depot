@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QtHelpProject version="1.0">
+  <namespace>Serpkov_Nikita.com.Depot.2.0</namespace>
+  <virtualFolder>documentation</virtualFolder>
+  
+  <customFilter name="Depot 2.0">
+    <filterAttribute>Depot</filterAttribute>
+    <filterAttribute>2.0</filterAttribute>
+  </customFilter>
+  
+  <toc>
+    <section title="Depot Manual" ref="index.html">
+  </toc>
+</QtHelpProject>

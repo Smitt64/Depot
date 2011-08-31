@@ -1,0 +1,7 @@
+/*! \mainpage Automated system to monitoring of key theoretical knowledge of students
+  \section condition_section Appointment and conditions of the program
+  The software package is designed to automate the monitoring of key theoretical knowledge of students.
+  Program complex allows to enter information about students, students in this institution,
+  and create and edit tests, we offer pre-tests by students at the passage. For the operation of complex
+  software on one computer in the network must be installed MySQL server version 5.0.1 or higher.
+  */
