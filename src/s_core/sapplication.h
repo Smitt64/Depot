@@ -9,6 +9,8 @@
 #include <QSettings>
 #include <QIcon>
 #include <QDebug>
+#include <QFile>
+#include <QtHelp/QHelpEngine>
 
 #define VERSION "1.0.0"
 #define SAFE_DELETE(p) ({delete p; p = NULL;})
@@ -31,12 +33,17 @@ public:
     CMainWindow *mainWindow();
 
     QObject *project();
+    QByteArray helpData(QString name);
+    QWidget *helpViewWidget(bool makeControls = false);
 
 private:
     static SApplication *s_App;
+    QHelpEngine *helpEngine;
     QApplication *s_app;
     FSHANDLE *resource;
     QObject *s_project;
+    QWidget *s_helpView;
     CMainWindow *mainWnd;
+    QFile *log;
 };
 #endif

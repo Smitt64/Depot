@@ -45,14 +45,15 @@ void removeThemeCommand::redo() {
 //==================================================================================
 addQuestionCommand::addQuestionCommand(const QString &type, const QString &alias,
                                        const QByteArray &settings, const QString &label,
+                                       const QStringList &toThemes,
                                        QUndoCommand *parent) :
     QUndoCommand(parent),
     quest_type(type),
     quest_alias(alias),
     quest_settings(settings),
-    quest_label(label)
+    quest_label(label),
+    qthemes(toThemes)
 {
-
 }
 
 void addQuestionCommand::undo() {
@@ -61,7 +62,13 @@ void addQuestionCommand::undo() {
 
 void addQuestionCommand::redo() {
     if(!S_PROJECT->addQuestion(quest_type, quest_alias,
-                           quest_settings, quest_label))
+                           quest_settings, qthemes, quest_label))
         return;
-    setText(QObject::tr("Question created: %1").arg(quest_alias));
+
+    foreach (QString theme, qthemes) {
+        S_PROJECT->addQuestionToTheme(theme, quest_alias);
+    }
+
+    setText(QObject::tr("Question created: %1\n"
+                        "%2").arg(quest_alias, quest_label));
 }

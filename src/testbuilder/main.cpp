@@ -12,6 +12,7 @@ int main(int argc, char **args)
 
     if(QApplication::startingUp())
         return 0x01;
+    //a.app()->setStyle("WindowsModernStyle");
     a.setResourcePackage("./data.sarc");
 
     MainWindow w;

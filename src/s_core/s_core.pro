@@ -1,10 +1,14 @@
 ﻿CONFIG += qt
-QT += xml sql xmlpatterns
+QT += xml sql xmlpatterns webkit network
 TEMPLATE = lib
-CONFIG += dll
+CONFIG += dll help
 
-release: DESTDIR = ../../bin/release
-debug: DESTDIR = ../../bin/debug
+DESTDIR = ../../bin
+#release: DESTDIR = ../../bin/release
+
+#inctall
+#target.path = ../../bin/
+#INSTALLS += target
 
 OBJECTS_DIR = .build
 MOC_DIR = .build
@@ -23,7 +27,10 @@ HEADERS = sapplication.h \
     interfaces/testtype_interface.h \
     defaulttesttypes/default_tst_types.h \
     scombobox.h \
-    interfaces/questeditor_interface.hpp
+    interfaces/questeditor_interface.hpp \
+    shelpcontentviewwidget.h \
+    msstyle/windowsmodernstyle.h \
+    filesystemobject.h
 
 SOURCES = sapplication.cpp \
           cmainwindow.cpp \
@@ -36,7 +43,10 @@ SOURCES = sapplication.cpp \
     scustomizedlg.cpp \
     stoolbar.cpp \
     defaulttesttypes/default_tst_types.cpp \
-    scombobox.cpp
+    scombobox.cpp \
+    shelpcontentviewwidget.cpp \
+    msstyle/windowsmodernstyle.cpp \
+    filesystemobject.cpp
 
 RESOURCES += \
     ../../res/s_core_res.qrc

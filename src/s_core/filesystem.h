@@ -6,8 +6,7 @@
 #include <QList>
 #include <QByteArray>
 #include <QString>
-
-//typedef struct File FSFILE, *LPFSFILE;
+#include <QFlags>
 
 typedef struct Header
 {
@@ -24,7 +23,7 @@ typedef struct File
     char m_pExtension[10];//Расширение
     int m_pCompressLevel;//Уровень сжатие
     int m_pPosition;//Положение в архиве
-    bool m_pTemp;//Временный?
+    quint32 m_flags;//flag
 }FSFILE;
 
 typedef struct ArchHandle
@@ -37,7 +36,13 @@ typedef struct ArchHandle
 
 class FileSystem
 {
+
 public:
+    enum FileFlag{
+        NoFlags = 0x0,
+        FileTemporary = 0x01
+    };
+    Q_DECLARE_FLAGS(FileFlags, FileFlag)
     //Врзвращает указатель на класс
     static FileSystem *getInst();
     //Открыть архив
@@ -51,6 +56,8 @@ public:
 
     //Архив открыт?
     bool fsIsOpen(FSHANDLE *handle);
+
+    void fsSetFileFlag(QString filename, int flag, FSHANDLE *handle);
 
     //Добавить файл в архив
     bool fsAddFile(QString source, QString name, FSHANDLE *handle, int compressLevel = 2);

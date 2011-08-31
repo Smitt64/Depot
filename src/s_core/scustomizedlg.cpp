@@ -5,29 +5,60 @@
 #include <QMdiArea>
 #include <QInputDialog>
 #include <QPainter>
+#include <QItemDelegate>
+#include <QStyleOptionMenuItem>
+#include <QStyleOptionViewItemV4>
 
 #define MAIN(x)(((CMainWindow*)(x)))
 
+SActionListItemDelegate::SActionListItemDelegate(QObject *parent) :
+    QStyledItemDelegate(parent)
+{
+
+}
+
+void SActionListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
+                       const QModelIndex &index) const {
+    painter->fillRect(option.rect, option.palette.background());
+
+    QStyle *style = qApp->style();
+    QStyleOptionMenuItem opt;
+    opt.text = index.data().toString();
+    opt.rect = option.rect;
+    opt.state = option.state;
+    opt.icon = index.data(Qt::DecorationRole).value<QIcon>();
+    opt.maxIconWidth = 0;
+
+    if((option.state & QStyle::State_MouseOver) == QStyle::State_MouseOver)
+        opt.state = opt.state | QStyle::State_Selected;
+
+    style->drawControl(QStyle::CE_MenuItem, &opt, painter);
+}
+////////////////////////////////////////////////////////////////////////
+
 SActionListWidget::SActionListWidget(QMainWindow *wnd, QWidget *parent) :
-    QListWidget(parent),
+    QListView(parent),
     window(wnd)
 {
+    setIconSize(QSize(16, 16));
+    setUniformItemSizes(true);
     QStringList keys = MAIN(window)->sactions.keys();
-    for(int i = 0; i < keys.count(); i++) {
-        QListWidgetItem *item = new QListWidgetItem;
-        item->setText(MAIN(window)->sactions[keys[i]]->text());
-        item->setData(Qt::UserRole, MAIN(window)->sactions[keys[i]]->data());
-        item->setIcon(MAIN(window)->sactions[keys[i]]->icon());
-        item->setToolTip(MAIN(window)->sactions[keys[i]]->statusTip());
-
-        addItem(item);
+    QStandardItemModel *m_model = new QStandardItemModel(keys.count(), 1);
+    int rows = 0;
+    foreach (QString itemName, keys) {
+        m_model->setData(m_model->index(rows, 0), MAIN(window)->sactions[itemName]->text(),
+                         Qt::DisplayRole);
+        m_model->setData(m_model->index(rows, 0), MAIN(window)->sactions[itemName]->icon(),
+                         Qt::DecorationRole);
+        m_model->setData(m_model->index(rows, 0), MAIN(window)->sactions[itemName]->statusTip(),
+                         Qt::ToolTipRole);
+        m_model->setData(m_model->index(rows, 0), MAIN(window)->sactions[itemName]->data(),
+                         Qt::UserRole);
+        rows ++;
     }
 
-    QListWidgetItem *item = new QListWidgetItem;
-    item->setText(tr("Separator"));
-    item->setBackground(QBrush(Qt::lightGray, Qt::Dense6Pattern));
-    item->setData(Qt::UserRole, "Separator");
-    addItem(item);
+    setModel(m_model);
+    setItemDelegate(new SActionListItemDelegate);
 }
 
 SActionListWidget::~SActionListWidget()
@@ -36,19 +67,20 @@ SActionListWidget::~SActionListWidget()
 }
 
 void SActionListWidget::mousePressEvent(QMouseEvent *event) {
-    QListWidgetItem *item = static_cast<QListWidgetItem*>(itemAt(event->pos()));
+    QModelIndex index = indexAt(event->pos());
 
-    if(!item)
+    if(!index.isValid())
         return;
 
-    QByteArray data = item->data(Qt::UserRole).toByteArray();
+    QByteArray data = index.data(Qt::UserRole + 1).toByteArray();
 
     QMimeData *mimeData = new QMimeData;
     mimeData->setData("actions/x-actiondata", data);
 
     QDrag *drag = new QDrag(this);
     drag->setMimeData(mimeData);
-    QPixmap map = item->icon().pixmap(64, 64, QIcon::Normal, QIcon::On);
+    QIcon iconData = index.data(Qt::DecorationRole).value<QIcon>();
+    QPixmap map(iconData.pixmap(64, 64, QIcon::Normal, QIcon::On));
 
     QPixmap icon(32, 32);
     icon.fill(Qt::transparent);
@@ -61,7 +93,7 @@ void SActionListWidget::mousePressEvent(QMouseEvent *event) {
     painter.end();
 
     drag->setPixmap(icon);
-    drag->setHotSpot(QPoint(icon.width() / 2, icon.height() / 2));
+    drag->setHotSpot(QPoint(icon.width() / 4, icon.height() / 4));
 
     if(drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction) == Qt::MoveAction) {
 
@@ -73,7 +105,6 @@ void SActionListWidget::dragEnterEvent(QDragEnterEvent *event) {
 
     }
 }
-
 ////////////////////////////////////////////////////////////////////////
 
 SCustomizeDlg::SCustomizeDlg(QMainWindow *wnd, QWidget *parent) :

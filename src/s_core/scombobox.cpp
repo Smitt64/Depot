@@ -57,3 +57,14 @@ int SComboBox::selectedItemsCount() {
 
     return count;
 }
+
+QStringList SComboBox::selectedItems() {
+    QStringList items;
+    QAbstractItemModel *tmodel = model();
+    for(int i = 0; i < tmodel->rowCount(); i++) {
+        if(tmodel->data(tmodel->index(i, 0), Qt::CheckStateRole).toInt() == Qt::Checked) {
+            items.append(tmodel->data(tmodel->index(i, 1)).toString());
+        }
+    }
+    return items;
+}

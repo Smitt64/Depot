@@ -51,13 +51,13 @@ QString QuestionsModel::questionType(QString name) {
 }
 
 QModelIndex QuestionsModel::questionIndex(QString name) {
-    QList<QStandardItem*> items = findItems(name, Qt::MatchCaseSensitive, 1);
-
-    if(items.count() == 0) {
-        return QModelIndex();
+    int rows = rowCount();
+    for(int i = 0; i < rows; i++) {
+        if(data(index(i, 1)).toString() == name)
+            return index(i, 1);
     }
 
-    return items[0]->index();
+    return QModelIndex();
 }
 
 bool QuestionsModel::hasQuestion(QString name) {
@@ -67,7 +67,6 @@ bool QuestionsModel::hasQuestion(QString name) {
 void QuestionsModel::addQuestion(QString type, QString name, QByteArray settings, QString label) {
     int rows = rowCount();
     insertRow(rows);
-    rows ++;
     setData(index(rows, 0), label);
     setData(index(rows, 1), name);
     setData(index(rows, 2), type);

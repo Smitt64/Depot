@@ -3,6 +3,8 @@
 #include <QObject>
 #include <QFileInfo>
 #include <qstringlist.h>
+#include <QBuffer>
+#include <QDebug>
 
 FileSystem *FileSystem::m_pInstance = NULL;
 
@@ -107,7 +109,7 @@ bool FileSystem::fsWriteFile(QByteArray data, QString name, bool temp, FSHANDLE 
     handle->file.write((const char*)handle->dataHeader, sizeof(Header));
 
     //Заполнить информацию о файле
-    File info = File();
+    File info;
     info.m_pCompressedSize = compressed.size();
     info.m_pCompressLevel = compressLevel;
 
@@ -116,7 +118,7 @@ bool FileSystem::fsWriteFile(QByteArray data, QString name, bool temp, FSHANDLE 
 
     info.m_pSize = data.size();
     info.m_pPosition = sizeof(Header) + handle->dataHeader->m_pFileBlockSize - dataSize;
-    info.m_pTemp = temp;
+    info.m_flags = (temp ? FileSystem::FileTemporary : 0);
 
     handle->fileList.push_back(info);
 
@@ -124,9 +126,7 @@ bool FileSystem::fsWriteFile(QByteArray data, QString name, bool temp, FSHANDLE 
     handle->file.resize(sizeof(Header) + handle->dataHeader->m_pFileBlockSize +
                         sizeof(File) * handle->dataHeader->m_pFileCount);
 
-    fsWriteFileList(handle);
-
-    return true;
+    return fsWriteFileList(handle);
 }
 
 bool FileSystem::fsAddFile(QString source, QString folder, FSHANDLE *handle, int compressLevel)
@@ -288,6 +288,7 @@ QString FileSystem::fsGetExstension(QString file)
 
 void FileSystem::fsClose(FSHANDLE *handle)
 {
+    //fsWriteFileList(handle);
     handle->fileList.clear();
     handle->file.close();
 }
@@ -382,19 +383,41 @@ bool FileSystem::fsRenameFile(QString fname, QString newFName, FSHANDLE *handle)
 bool FileSystem::fsWriteFileList(FSHANDLE *handle)
 {
     QByteArray fileTable;
-    QDataStream stream(&fileTable, QIODevice::WriteOnly);
-    stream.setVersion(QDataStream::Qt_4_6);
+    QBuffer buf(&fileTable);
+    buf.open(QIODevice::WriteOnly);
 
-    for(int i = 0; i < handle->fileList.size(); i++)
+    QDataStream stream(&buf);
+    stream.setVersion(QDataStream::Qt_4_7);
+
+    /*for(int i = 0; i < handle->fileList.size(); i++)
     {
         File f = handle->fileList[i];
         stream.device()->write((const char*)&f, sizeof(File));
+    }*/
+    foreach (File f, handle->fileList) {
+        if(stream.device()->write((const char*)&f, sizeof(File)) != sizeof(File))
+            return false;
     }
+    buf.close();
 
     fileTable = qCompress(fileTable, 1);
+
+    if(fileTable.isNull()) {
+        qDebug() << "fileTable is null!";
+        return false;
+    }
+
     handle->file.seek(sizeof(Header) + handle->dataHeader->m_pFileBlockSize);
-    handle->file.write(fileTable);
-    handle->file.flush();
+
+    if(handle->file.write(fileTable) != fileTable.size()) {
+        qDebug() << "write file table error!";
+        return false;
+    }
+
+    if(!handle->file.flush()) {
+        qDebug() << "flush error!";
+        return false;
+    }
 
     return true;
 }
@@ -420,9 +443,11 @@ QString FileSystem::fsGetFDir(QString fileName)
 
 void FileSystem::fsFlushTempFiles(FSHANDLE *handle)
 {
-    for(int i = 0; i < handle->fileList.count(); i++)
-        if(handle->fileList[i].m_pTemp)
-            handle->fileList[i].m_pTemp = false;
+    for(int i = 0; i < handle->fileList.count(); i++) {
+        QFlags<FileFlag> fl = QFlags<FileFlag>(handle->fileList[i].m_flags);
+        if(fl.testFlag(FileSystem::FileTemporary))
+            handle->fileList[i].m_flags ^= QFlags<FileFlag>(FileSystem::FileTemporary);
+    }
 
     this->fsWriteFileList(handle);
 }
@@ -431,7 +456,7 @@ void FileSystem::fsDeleteTempFiles(FSHANDLE *handle)
 {
     QStringList toDelete;
     for(int i = 0; i < handle->fileList.count(); i++)
-        if(handle->fileList[i].m_pTemp)
+        if(QFlags<FileFlag>(handle->fileList[i].m_flags).testFlag(FileSystem::FileTemporary))
             toDelete.push_back(handle->fileList[i].m_pName);
 
     for(int i = 0; i < toDelete.count(); i++)
@@ -500,4 +525,13 @@ QStringList FileSystem::fsGetFileNamesList(FSHANDLE *handle)
 bool FileSystem::fsIsOpen(FSHANDLE *handle)
 {
     return handle->file.isOpen();
+}
+
+void FileSystem::fsSetFileFlag(QString filename, int flag, FSHANDLE *handle) {
+    if(!fsHasFile(filename, handle))
+        return;
+    int index = fsGetFileIndex(filename, handle);
+    handle->fileList[index].m_flags = flag;
+
+    this->fsWriteFileList(handle);
 }

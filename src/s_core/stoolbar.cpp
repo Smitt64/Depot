@@ -8,7 +8,9 @@
 
 SToolBar::SToolBar(QWidget *parent) :
     QToolBar(parent),
-    isUserToolBar(false)
+    isUserToolBar(false),
+    movedAction(false),
+    firstGrab(true)
 {
     setAcceptDrops(true);
     setMinimumSize(100, 16);
@@ -45,6 +47,9 @@ void SToolBar::dropEvent(QDropEvent *event) {
             return;
         }
         insertAction(at, SApplication::inst()->mainWindow()->sactions[name]);
+        movedAction = false;
+        firstGrab = true;
+        update();
         event->accept();
     }
     else {
@@ -55,6 +60,7 @@ void SToolBar::dropEvent(QDropEvent *event) {
 void SToolBar::dragMoveEvent(QDragMoveEvent *event) {
     if(event->mimeData()->hasFormat("actions/x-actiondata") && isUserToolBar) {
         event->setDropAction(Qt::MoveAction);
+        update();
         event->accept();
     }
     else {
@@ -62,8 +68,20 @@ void SToolBar::dragMoveEvent(QDragMoveEvent *event) {
     }
 }
 
+void SToolBar::dragLeaveEvent(QDragLeaveEvent *event) {
+    movedAction = false;
+    firstGrab = true;
+    update();
+    event->accept();
+}
+
 void SToolBar::dragEnterEvent(QDragEnterEvent *event) {
     if (event->mimeData()->hasFormat("actions/x-actiondata") && isUserToolBar) {
+        if(firstGrab) {
+            grabed = QPixmap::grabWidget(this);
+            firstGrab = false;
+        }
+        movedAction = true;
         event->accept();
     }
     else
@@ -79,8 +97,44 @@ void SToolBar::setUser(bool value) {
 }
 
 void SToolBar::paintEvent(QPaintEvent *event) {
-    QPainter painter(this);
-    QToolBar::paintEvent(event);
+    if(!movedAction)
+        QToolBar::paintEvent(event);
+    else {
+        QPainter painter(this);
+        QPixmap positioner;//(":/insert_at");
+        if(orientation() == Qt::Horizontal) {
+            positioner.load(":/insert_at");
+        } else {
+            QPixmap tmp(":/insert_at");
+            positioner = QPixmap(tmp.height(), tmp.width());
+            QPainter posPaint(&positioner);
+            posPaint.rotate(90);
+            posPaint.drawPixmap(0, 0, tmp);
+        }
+
+        painter.drawPixmap(0, 0, grabed);
+
+        QAction *action = actionAt(mapFromGlobal(QCursor::pos()));
+        if(action) {
+            QWidget *widget = widgetForAction(action);
+            if(orientation() == Qt::Horizontal) {
+                painter.drawPixmap(widget->pos().x(), 0, positioner);
+            } else {
+                painter.drawPixmap(0, widget->pos().y(), positioner);
+            }
+        } else {
+            if(orientation() == Qt::Horizontal) {
+                painter.drawPixmap(actions().count() * iconSize().width() +
+                                   (iconSize().width() / 2) * actions().count()
+                                   + positioner.width(),
+                                   0, positioner);
+            } else {
+                painter.drawPixmap(0, actions().count() * iconSize().height() +
+                                   (iconSize().height() / 2) * actions().count()
+                                   + positioner.height(), positioner);
+            }
+        }
+    }
 }
 
 bool SToolBar::event(QEvent *event) {

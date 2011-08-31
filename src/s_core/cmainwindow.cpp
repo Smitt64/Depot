@@ -184,14 +184,17 @@ void CMainWindow::makeFileMenu(const bool &withToolBar) {
         fileOpen->setShortcut(QKeySequence::Open);
 
         QAction *fileSave = addAction(tr("Save..."), "save", "File", QIcon(":/save"));
+        fileSave->setEnabled(false);
         fileSave->setStatusTip(tr("Save changes..."));
         fileSave->setShortcut(QKeySequence::Save);
 
         QAction *fileSaveAs = addAction(tr("Save as..."), "saveas", "File", QIcon(":/saveall"));
+        fileSaveAs->setEnabled(false);
         fileSaveAs->setStatusTip(tr("Save as new file..."));
         fileSaveAs->setShortcut(QKeySequence::SaveAs);
 
         QAction *fileClose = addAction(tr("Close"), "close", "File");
+        fileClose->setEnabled(false);
         fileClose->setStatusTip(tr("Close current file..."));
         fileClose->setShortcut(QKeySequence::Close);
 
@@ -329,6 +332,7 @@ void CMainWindow::makeServiceMenu() {
     QMenu *service_menu = addMenu(tr("Service"), "service_menu");
 
     QAction *customize = addAction(tr("Customize"), "custom_action", "service_menu");
+    customize->setStatusTip(tr("Customizing toolbars..."));
 
     dlg = new SCustomizeDlg(this, this);
     dlg->setWindowModality(Qt::NonModal);

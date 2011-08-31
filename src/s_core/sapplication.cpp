@@ -1,17 +1,34 @@
 ﻿#include "sapplication.h"
 #include "sproject.h"
+#include "shelpcontentviewwidget.h"
+#include <QMessageBox>
 
 SApplication *SApplication::s_App = NULL;
 
 SApplication::SApplication(int argc, char **args) :
     s_project(NULL),
-    mainWnd(NULL)
+    mainWnd(NULL),
+    s_helpView(NULL),
+    helpEngine(NULL)
 {
     QCoreApplication::setOrganizationName("Serpkov_Nikita");
     QCoreApplication::setApplicationName("TestBuilder");
     QCoreApplication::setApplicationVersion(VERSION);
 
     s_app = new QApplication(argc, args);
+    log = new QFile("log.txt");
+    bool opened = log->open(QIODevice::ReadWrite | QIODevice::Text);
+    QTextStream stream(log);
+    /*QDir dir = QDir::current();
+    dir.cd("..");*/
+
+    helpEngine = new QHelpEngine("../doc/depot_doc_collection.qhc");
+                /*QString("%1/doc/depot_doc_collection.qhc")
+                                 .arg(dir.path()));*/
+    stream << QDir::current().path() << helpEngine->error();
+    //qDebug() << QString("%1/doc/depot_doc_collection.qhc")
+                //.arg(dir.path());
+                //"../doc/depot_doc_collection.qhc");
     QSettings set;
 
     resource = new FSHANDLE;
@@ -77,4 +94,13 @@ void SApplication::setMainWindow(CMainWindow *value) {
 
 CMainWindow *SApplication::mainWindow() {
     return mainWnd;
+}
+
+QByteArray SApplication::helpData(QString name) {
+    return helpEngine->fileData(QUrl(name));
+}
+
+QWidget *SApplication::helpViewWidget(bool makeControls) {
+    HelpView *hlp = new HelpView(makeControls);
+    return (QWidget*)hlp;
 }

@@ -2,6 +2,7 @@
 #include "sapplication.h"
 #include "sproject.h"
 #include "scombobox.h"
+#include "shelpcontentviewwidget.h"
 
 EditQuestionDlg::EditQuestionDlg(QWidget *parent) :
     QDialog(parent)
@@ -12,6 +13,7 @@ EditQuestionDlg::EditQuestionDlg(QWidget *parent) :
     save_changes = buttons->addButton(tr("Save"), QDialogButtonBox::AcceptRole);
     save_changes->setEnabled(false);
     cancel = buttons->addButton(tr("Cancel"), QDialogButtonBox::RejectRole);
+    help = buttons->addButton(tr("Help"), QDialogButtonBox::HelpRole);
 
     quest_type = new QComboBox;
     quest_type->setWhatsThis(tr("List of accessible questions types."));
@@ -27,7 +29,6 @@ EditQuestionDlg::EditQuestionDlg(QWidget *parent) :
     layout = new QVBoxLayout;
     layout->addLayout(form);
     editor = S_PROJECT->questEditing(quest_type->model()->data(quest_type->model()->index(quest_type->currentIndex(), 1)).toString());
-            //->questEditing(((QStandardItemModel*)(quest_type->model()))->item(quest_type->currentIndex(), 1)->text());
     layout->addWidget((QWidget*)editor);
     layout->addWidget(buttons);
 
@@ -39,6 +40,7 @@ EditQuestionDlg::EditQuestionDlg(QWidget *parent) :
     connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
     connect(quest_type, SIGNAL(currentIndexChanged(int)), this, SLOT(questTypeChanged(int)));
     connect(editor, SIGNAL(validationChanged(bool)), this, SLOT(validQestion(bool)));
+    connect(help, SIGNAL(clicked()), this, SLOT(showHelp()));
 }
 
 EditQuestionDlg::~EditQuestionDlg() {
@@ -68,12 +70,12 @@ void EditQuestionDlg::validQestion(bool isValid) {
     }
 }
 
-QString EditQuestionDlg::questName() {
-    return editor->makeQuestionAlias();
+QString EditQuestionDlg::questName(int counter) {
+    return editor->makeQuestionAlias(counter);
 }
 
 QString EditQuestionDlg::questLabel() {
-
+    return editor->makeQuestionLabel();
 }
 
 QString EditQuestionDlg::questType() {
@@ -87,7 +89,33 @@ QByteArray EditQuestionDlg::questConfig(QString questionName) {
     QDomDocument doc;
     QDomElement element = doc.createElement("question");
     element.setAttribute("alias", questionName);
-    editor->makeQuestionConfig(&element);
+    element.setAttribute("type", questType());
+    editor->makeQuestionConfig(&element, doc);
+    doc.appendChild(element);
+
+    QTextStream stream(&content);
+    doc.save(stream, 3);
 
     return content;
+}
+
+QStringList EditQuestionDlg::selectedThemes() {
+    return ((SComboBox*)groups_box)->selectedItems();
+}
+
+void EditQuestionDlg::showHelp() {
+    QDialog *dlg = new QDialog(this);
+    dlg->setWindowModality(Qt::NonModal);
+    QLayout *form = new QVBoxLayout(dlg);
+    form->addWidget(SApplication::inst()->helpViewWidget());
+    dlg->setLayout(form);
+    dlg->show();
+}
+
+int EditQuestionDlg::getResCount() {
+    return editor->getResCount();
+}
+
+void EditQuestionDlg::getResource(int id, QString *name, QByteArray *res_data) {
+    editor->getResource(id, name, res_data);
 }

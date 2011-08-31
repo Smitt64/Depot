@@ -9,9 +9,21 @@
 #include <QPushButton>
 #include <QDialogButtonBox>
 #include <QStylePainter>
+#include <QItemDelegate>
+#include <QStyledItemDelegate>
+#include <QAbstractItemModel>
 #include "stoolbar.h"
 
-class SActionListWidget : public QListWidget
+class SActionListItemDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+public:
+    SActionListItemDelegate(QObject *parent = 0);
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem & option,
+                       const QModelIndex &index) const;
+};
+
+class SActionListWidget : public QListView
 {
     Q_OBJECT
 public:

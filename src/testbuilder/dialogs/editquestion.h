@@ -20,22 +20,27 @@ public:
     EditQuestionDlg(QWidget *parent = 0);
     ~EditQuestionDlg();
 
-    QString questName();
+    QString questName(int counter);
     QString questLabel();
     QString questType();
+    QStringList selectedThemes();
     QByteArray questConfig(QString questionName);
+
+    int getResCount();
+    void getResource(int id, QString *name, QByteArray *res_data);
 
 private slots:
     void questTypeChanged(int index);
     void addResourceFromRedactor(QString name, QByteArray data);
     void validQestion(bool isValid);
+    void showHelp();
 
 private:
     QDialogButtonBox  *buttons;
     QComboBox *quest_type, *groups_box;
     QTabWidget *tabWidget;
     QPushButton *save_changes;
-    QPushButton *cancel;
+    QPushButton *cancel, *help;
     QFormLayout *form;
     QBoxLayout *layout;
     QuestEditorInterface *editor;

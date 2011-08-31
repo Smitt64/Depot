@@ -201,6 +201,15 @@ void STextEditorView::setText(QString source) {
     textEdit->setPlainText(source);
 }
 
+QByteArray STextEditorView::save() {
+    QByteArray saved;
+    QTextStream stream(&saved);
+
+    stream << html();
+
+    return saved;
+}
+
 /////////////////////////////////////////////////////////////////////////
 
 STextEditor::STextEditor(QWidget *parent) :
@@ -260,4 +269,8 @@ void STextEditor::contentChanged() {
         okButton->setEnabled(true);
     }else
         okButton->setEnabled(false);
+}
+
+QByteArray STextEditor::save() {
+    return editor->save();
 }

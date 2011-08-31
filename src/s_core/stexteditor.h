@@ -17,6 +17,8 @@ public:
 
     bool isModified();
     bool isEmpty();
+
+    QByteArray save();
     QString html();
     QString plainText();
 
@@ -58,6 +60,7 @@ class STextEditor : public QDialog
     Q_OBJECT
 public:
     explicit STextEditor(QWidget *parent = 0);
+    QByteArray save();
     QString html();
     QString plainText();
 
