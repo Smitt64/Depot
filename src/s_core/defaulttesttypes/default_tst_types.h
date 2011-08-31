@@ -8,6 +8,11 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
+/*!
+  \english
+  ClosedTestEditor class provides
+  \endenglish
+  */
 class ClosedTestEditor : QuestEditorInterface
 {
     Q_OBJECT
@@ -16,8 +21,8 @@ public:
 
     virtual void getResource(int id, QString *name, QByteArray *data);
     virtual int getResCount();
-    virtual void makeQuestionConfig(QDomElement *questElement);
-    virtual QString makeQuestionAlias();
+    virtual void makeQuestionConfig(QDomElement *questElement, QDomDocument document);
+    virtual QString makeQuestionAlias(int counter);
     virtual QString makeQuestionLabel();
 
 private slots:
@@ -33,6 +38,7 @@ private:
     QPushButton *addBtn, *editBtn, *remBtn;
     QTableWidget *answers;
     int oldAnswersCount;
+    QMap<QString, QByteArray> resources;
 };
 
 class Closed_Question : public TestType_Interface
@@ -49,8 +55,8 @@ public:
 
     virtual void getResource(int id, QString *name, QByteArray *data);
     virtual int getResCount();
-    virtual void makeQuestionConfig(QDomElement *questElement);
-    virtual QString makeQuestionAlias();
+    virtual void makeQuestionConfig(QDomElement *questElement, QDomDocument document);
+    virtual QString makeQuestionAlias(int counter);
     virtual QString makeQuestionLabel();
 
 private:

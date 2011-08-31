@@ -50,7 +50,7 @@ QuestEditorInterface(QWidget *parent = 0) :
       \sa makeQuestionConfig generating configuration about question
       \param questElement XML branch to hold the question configuration
       */
-    virtual void makeQuestionConfig(QDomElement *questElement) = 0;
+    virtual void makeQuestionConfig(QDomElement *questElement, QDomDocument document) = 0;
     //! A pure virtual member.
     /*!
       \code
@@ -61,10 +61,11 @@ QString ClosedTestEditor::makeQuestionAlias(int questInType, int questsCount) {
 }
       \endcode
       \sa makeQuestionAlias generating base question alias
+      \param counter questions count
       \see makeQuestionLabel
       \return universal base question alias
       */
-    virtual QString makeQuestionAlias() = 0;
+    virtual QString makeQuestionAlias(int counter) = 0;
     //! A pure virtual member.
     /*!
       \sa makeQuestionLabel generate text signature of question

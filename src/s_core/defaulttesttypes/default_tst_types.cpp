@@ -59,6 +59,7 @@ void ClosedTestEditor::updateCheckCell(int row, int column) {
     if(column == 0) {
         QTableWidgetItem *item = answers->item(row, 0);
         item->setText((item->checkState() == Qt::Checked ? tr("Yes") : tr("No")));
+        validQuestion();
     }
 }
 
@@ -105,41 +106,76 @@ void ClosedTestEditor::removeAnswer() {
 
 void ClosedTestEditor::answerSelectionChanged() {
     bool enabled = (answers->rowCount() && answers->currentRow() != -1 ? true : false);
+    validQuestion();
     editBtn->setEnabled(enabled);
     remBtn->setEnabled(enabled);
 }
 
 void ClosedTestEditor::validQuestion() {
-    if(text_editor->isModified()
+    if((text_editor->isModified() || !text_editor->isEmpty())
             && answers->rowCount() != oldAnswersCount
-            && answers->rowCount() > 2) {
+            && answers->rowCount() >= 2) {
+        bool fChecked = false;
         for(int i = 0; i < answers->rowCount(); i++) {
             if(answers->item(i, 0)->checkState() == Qt::Checked) {
                 emit validationChanged(true);
+                fChecked = true;
                 break;
             }
         }
-        emit validationChanged(false);
+        if(!fChecked)
+            emit validationChanged(false);
     }else {
         emit validationChanged(false);
     }
 }
 
 void ClosedTestEditor::getResource(int id, QString *name, QByteArray *data) {
+    QStringList keys = resources.keys();
+    *name = keys[id];
+    *data = resources[*name];
 }
 
 int ClosedTestEditor::getResCount() {
-    return 0;
+    return answers->rowCount() + 1;
 }
 
-void ClosedTestEditor::makeQuestionConfig(QDomElement *questElement) {
-    //QDomDocument doc;
-    //QDomElement root = doc.createElement("question");
-    //root.setAttribute("type", );
+void ClosedTestEditor::makeQuestionConfig(QDomElement *questElement,
+                                          QDomDocument document) {
+    int answersCount = answers->rowCount();
+
+    int checksCount = 0;
+    QString questAlias = questElement->attribute("alias", QString::null);
+
+    if(questAlias.isNull())
+        return;
+
+    resources.insert(QString("src\\quest_%1_source.html")
+                     .arg(questAlias), text_editor->save());
+
+    for(int i = 0; i < answersCount; i++) {
+        QDomElement answerElement = document.createElement("answer");
+        QString aSource = QString("src\\quest_%1_answer%2.html")
+                .arg(questAlias)
+                .arg(i + 1);
+
+        answerElement.setAttribute("src", aSource);
+        bool checked = (answers->item(i, 0)->checkState() == Qt::Checked ? true : false);
+        answerElement.setAttribute("right", checked);
+        answerElement.appendChild(document.createTextNode(answers->item(i, 1)->text()));
+
+        resources.insert(aSource, answers->item(i, 1)->data(Qt::UserRole).toByteArray());
+
+        if(checked)
+            checksCount ++;
+
+        (*questElement).appendChild(answerElement);
+    }
+    questElement->setAttribute("checksCount", checksCount);
 }
 
-QString ClosedTestEditor::makeQuestionAlias() {
-    return QString("closed_quest");
+QString ClosedTestEditor::makeQuestionAlias(int counter) {
+    return QString("closed_quest_%1").arg(counter);
 }
 
 QString ClosedTestEditor::makeQuestionLabel() {
@@ -181,10 +217,11 @@ int FreeChouseEditor::getResCount() {
     return 0;
 }
 
-void FreeChouseEditor::makeQuestionConfig(QDomElement *questElement) {
+void FreeChouseEditor::makeQuestionConfig(QDomElement *questElement,
+                                          QDomDocument document) {
 }
 
-QString FreeChouseEditor::makeQuestionAlias() {
+QString FreeChouseEditor::makeQuestionAlias(int counter) {
     return QString();
 }
 
