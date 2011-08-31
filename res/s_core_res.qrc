@@ -17,5 +17,16 @@
         <file alias="theme">icons/theme.png</file>
         <file alias="themegroup">icons/theme_group.png</file>
         <file alias="separator">icons/separator.png</file>
+        <file alias="align_center">toolbar/AlignCenter.png</file>
+        <file alias="align_left">toolbar/AlignLeft.PNG</file>
+        <file alias="align_right">toolbar/AlignRight.png</file>
+        <file alias="text_bold">toolbar/boldhs.png</file>
+        <file alias="text_italic">toolbar/ItalicHS.png</file>
+        <file alias="underline">toolbar/underline.png</file>
+        <file alias="align_justify">toolbar/AlignJustify.png</file>
+        <file alias="font_color">toolbar/Color_fontHS.png</file>
+        <file alias="insert_at">icons/insertAt.png</file>
+        <file alias="add_quest">toolbar/addQuestion.png</file>
+        <file alias="removeQuestion">toolbar/remove_question.png</file>
     </qresource>
 </RCC>
