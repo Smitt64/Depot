@@ -88,6 +88,8 @@ public:
     void unregResource(const QString &questAlias, const QString &qResource = QString());
     QStringList resourcesForQuestion(const QString &questAlias);
 
+    QByteArray writeXMLConfig(const QDomElement &questionConf = QDomElement());
+
 signals:
     void themeAdded(QString title, QString alias);
     void themeRemoved(QString alias);
@@ -95,6 +97,7 @@ signals:
     void questionRemoved(QString questAlias, QStringList fromThemes);
     void modifyChanged(bool value);
     void error(QString msg);
+    void projectClosed();
 
 public slots:
     bool openProject(const QString &filename);
@@ -102,8 +105,9 @@ public slots:
     bool saveProject();
 
 private:
-    QByteArray writeXMLConfig(const QDomElement &questionConf = QDomElement());
+    //QByteArray writeXMLConfig(const QDomElement &questionConf = QDomElement());
     QModelIndex questTypeIndex(const QString &typeName);
+    QDomElement makeElement(const QString &xml_string);
     //int fileArchive(const QString &filename);
     //bool moveData(const QString &filename, int from = 1, int to = 0);
     int canClose();

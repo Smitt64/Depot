@@ -23,35 +23,35 @@ STextEditorView::STextEditorView(QWidget *parent) :
     tool_bar->addWidget(font_box);
     tool_bar->addSeparator();
 
-    actionTextBold = tool_bar->addAction(QIcon(":/text_bold"), tr("Bold"));
+    actionTextBold = tool_bar->addAction(QIcon::fromTheme("format-text-bold"), tr("Bold"));
     actionTextBold->setCheckable(true);
     actionTextBold->setShortcut(Qt::CTRL + Qt::Key_B);
     actionTextBold->setCheckable(true);
 
-    actionTextItalic = tool_bar->addAction(QIcon(":/text_italic"), tr("Italic"));
+    actionTextItalic = tool_bar->addAction(QIcon::fromTheme("format-text-italic"), tr("Italic"));
     actionTextItalic->setShortcut(Qt::CTRL + Qt::Key_I);
     actionTextItalic->setCheckable(true);
 
-    actionTextUnderline = tool_bar->addAction(QIcon(":/underline"), tr("Underline"));
+    actionTextUnderline = tool_bar->addAction(QIcon::fromTheme("format-text-underline"), tr("Underline"));
     actionTextUnderline->setShortcut(Qt::CTRL + Qt::Key_U);
     actionTextUnderline->setCheckable(true);
 
     tool_bar->addSeparator();
 
     QActionGroup *grp = new QActionGroup(this);
-    actionAlignLeft = new QAction(QIcon(":/align_left"), tr("Align left"), grp);
+    actionAlignLeft = new QAction(QIcon::fromTheme("format-justify-left"), tr("Align left"), grp);
     actionAlignLeft->setShortcut(Qt::CTRL + Qt::Key_L);
     actionAlignLeft->setCheckable(true);
 
-    actionAlignCenter = new QAction(QIcon(":/align_center"), tr("Align center"), grp);
+    actionAlignCenter = new QAction(QIcon::fromTheme("format-justify-center"), tr("Align center"), grp);
     actionAlignCenter->setShortcut(Qt::CTRL + Qt::Key_E);
     actionAlignCenter->setCheckable(true);
 
-    actionAlignRight = new QAction(QIcon(":/align_right"), tr("Align right"), grp);
+    actionAlignRight = new QAction(QIcon::fromTheme("format-justify-right"), tr("Align right"), grp);
     actionAlignRight->setShortcut(Qt::CTRL + Qt::Key_R);
     actionAlignRight->setCheckable(true);
 
-    actionAlignJustify = new QAction(QIcon(":/align_justify"), tr("Align justify"), grp);
+    actionAlignJustify = new QAction(QIcon::fromTheme("format-justify-fill"), tr("Align justify"), grp);
     actionAlignJustify->setShortcut(Qt::CTRL + Qt::Key_J);
     actionAlignJustify->setCheckable(true);
 
@@ -59,7 +59,7 @@ STextEditorView::STextEditorView(QWidget *parent) :
 
     tool_bar->addSeparator();
 
-    actionTextColor = tool_bar->addAction(QIcon(":/font_color"), tr("Font color"));
+    actionTextColor = tool_bar->addAction(QIcon::fromTheme("format-font-color"), tr("Font color"));
 
     connect(grp, SIGNAL(triggered(QAction*)), this, SLOT(textAlign(QAction*)));
     connect(textEdit, SIGNAL(currentCharFormatChanged(QTextCharFormat)),

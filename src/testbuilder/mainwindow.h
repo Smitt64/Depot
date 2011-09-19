@@ -2,8 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QUndoView>
-#include <QTreeWidget>
-#include <QMdiArea>
+#include <QtGui>
 #include "cmainwindow.h"
 
 class MainWindow : public CMainWindow
@@ -14,12 +13,16 @@ public:
 
 signals:
 
+public slots:
+    void openDocument(const QString &fileName);
+
 private slots:
     void createProject();
     void closeProject();
     void openProject();
     void saveProject();
     void projectModifyed(bool value);
+    void projectClosed();
 
     void addTheme();
     void removeTheme();
@@ -35,12 +38,21 @@ private slots:
 
     void debugOutput(QString msg);
     void tstStructContextMenu(QPoint pos);
+    void showTestConfig();
+    void openRecentFile();
 
 private:
     void updateTestStruct();
+    void updateRecentFileActions();
+    void setCurrentFile(const QString &fileName);
+    QString curFile;
+    QList<QAction*> recentFileActs;
+    int MaxRecentFiles;
+    QAction *separatorAct;
     QUndoView *commandsHistory;
     QTreeWidget *tst_struct;
-    QMenu *theme_mehu, *quest_menu;
+    QComboBox *helpSearch;
+    QMenu *theme_mehu, *quest_menu, *test_menu;
     QTreeWidgetItem *theme_item;
     QMdiArea *mdiArea;
 };

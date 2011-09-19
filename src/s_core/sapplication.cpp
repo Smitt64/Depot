@@ -5,7 +5,7 @@
 
 SApplication *SApplication::s_App = NULL;
 
-SApplication::SApplication(int argc, char **args) :
+SApplication::SApplication(int argc, char *args[]) :
     s_project(NULL),
     mainWnd(NULL),
     s_helpView(NULL),
@@ -103,4 +103,8 @@ QByteArray SApplication::helpData(QString name) {
 QWidget *SApplication::helpViewWidget(bool makeControls) {
     HelpView *hlp = new HelpView(makeControls);
     return (QWidget*)hlp;
+}
+
+QHelpEngine *SApplication::assistantEngine() {
+    return helpEngine;
 }

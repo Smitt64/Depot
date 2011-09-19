@@ -1,5 +1,6 @@
 #include "filesystemobject.h"
 #include <QFile>
+#include <QDebug>
 
 FileSystemObject::FileSystemObject(QObject *parent) :
     QObject(parent)
@@ -147,5 +148,6 @@ bool FileSystemObject::moveFile(const QString &filename, int from, int to) {
         return false;
 
     QByteArray f_data = fileData(filename, from);
+    qDebug() << "moveFile" << f_data;
     return addFile(f_data, filename, to);
 }

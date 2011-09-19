@@ -115,7 +115,7 @@ bool SProject::create(const QString &filename) {
     }
     FileSystem::getInst()->fsClose(file_handle);*/
     //Test file
-    fsManager->addArchive(filename, true);
+    qDebug() << "addArchive" << fsManager->addArchive(filename, true);
     //Temp test file
     fsManager->addArchive(QString("%1/~%2")
                           .arg(QDir::tempPath(), QFileInfo(filename).fileName()));
@@ -150,8 +150,17 @@ bool SProject::create(const QString &filename) {
 }
 
 bool SProject::openProject(const QString &filename) {
-    if(isModifyed())
-        close();
+    int saveRet = canClose();
+    if(saveRet != 0) {
+        if(saveRet == 1) {
+            saveProject();
+            close();
+        } else if(saveRet == 2) {
+            close();
+        } else {
+            return false;
+        }
+    }
 
     if(!fsManager->addArchive(filename)) {
         return false;
@@ -167,10 +176,24 @@ bool SProject::openProject(const QString &filename) {
     xmlQuery.bindVariable("document", &file);
 
     QDomDocument document;
-    if(!document.setContent(data))
+    QString err;
+    int line, column;
+    if(!document.setContent(data, &err, &line, &column)) {
+        error(tr("%1\nLine: %2\nColumn: %3")
+              .arg(err)
+              .arg(line)
+              .arg(column));
+        qDebug() << data;
         return false;
+    }
     QDomElement documentElement = document.documentElement();
     QDomElement themesElement = documentElement.firstChildElement("themes");
+    thmes_counter = themesElement.attribute("thmes_counter", "-1").toInt();
+    bool auto_theme_counting = false;
+
+    if(thmes_counter == -1)
+        auto_theme_counting = true;
+
     for(QDomNode n = themesElement.firstChild(); !n.isNull(); n = n.nextSibling()) {
         QDomElement element = n.toElement();
         QString node;
@@ -178,9 +201,38 @@ bool SProject::openProject(const QString &filename) {
                           .arg(element.attribute("alias")));
         xmlQuery.evaluateTo(&node);
 
+        QString tAlias = element.attribute("alias", "");
         addTheme(element.attribute("title"),
-                 element.attribute("alias", ""),
+                 tAlias,
                  element.attribute("row", "-1").toInt());
+
+        for(QDomNode qn = element.firstChild(); !qn.isNull(); qn = qn.nextSibling()) {
+            QDomElement qElement = qn.toElement();
+            themes[themes.keys().last()]->questions.append(qElement.text());
+        }
+
+        if(auto_theme_counting)
+            thmes_counter ++;
+    }
+    QDomElement questsElement = documentElement.firstChildElement("questions");
+    for (QDomNode n = questsElement.firstChild(); !n.isNull(); n = n.nextSibling()) {
+        QDomElement element = n.toElement();
+        QString qType = element.attribute("type");
+        QString qAlias = element.attribute("alias");
+        QString qLabel = (element.attribute("label").isNull() ? qAlias : element.attribute("label"));
+                //(element.text().isNull() ? QString() : element.text());
+        QStringList list;
+        foreach (theme *th, themes) {
+            if(th->questions.contains(qAlias))
+                list.append(th->alias);
+        }
+        QString settings;
+        xmlQuery.setQuery(QString("doc($document)/test/questions/question[@alias=\"%1\"]")
+                          .arg(qAlias));
+        xmlQuery.evaluateTo(&settings);
+
+        qDebug() << settings << list;
+        addQuestion(qType, qAlias, settings.toLocal8Bit(), list, qLabel);
     }
     return true;
 }
@@ -200,6 +252,7 @@ bool SProject::saveProject() {
         fsManager->moveFile(file.m_pName, 1, 0);
     }*/
     qDebug() << "moveFile" << fsManager->moveFile("questions.xml", 1, 0);
+    undo_stack->clear();
     return true;
 }
 
@@ -207,8 +260,8 @@ int SProject::canClose() {
     if(isModifyed()) {
         QMessageBox::StandardButton btn = QMessageBox::question(SApplication::inst()->mainWindow(),
                                                                 tr("Saving test!"),
-                                                                tr("<B>Test has been modifyed.</B>\n"
-                                                                   "Do you want to save changes?"),
+                                                                tr("<B>Test has been modifyed.</B>"
+                                                                   "<P>Do you want to save changes?</P>"),
                                                                 QMessageBox::Yes | QMessageBox::No
                                                                 | QMessageBox::Cancel);
         if(btn == QMessageBox::Yes) {
@@ -350,9 +403,25 @@ QUndoStack *SProject::undoStack() {
 }
 
 void SProject::close() {
+    int saveRet = canClose();
+    if(saveRet != 0) {
+        if(saveRet == 1) {
+            saveProject();
+        } else if(saveRet == 2) {
+        } else {
+            return;
+        }
+    }
+    emit projectClosed();
     undo_stack->clear();
     fsManager->deleteArchive(1, true);
     fsManager->deleteArchive(0);
+    thmes_counter = 0;
+    res_counter = 0;
+    quest_counter = 0;
+    registered_resources.clear();
+    quest_model->clear();
+    themes_model->clear();
 }
 
 bool SProject::containsTheme(const QString &alias) {
@@ -364,7 +433,7 @@ bool SProject::containsTheme(const QString &alias) {
 }
 
 bool SProject::addTheme(const QString &title, const QString &alias, const int &index) {
-    if(containsTheme(title))
+    if(containsTheme(alias))
         return false;
 
     if(alias.isEmpty())
@@ -382,7 +451,7 @@ bool SProject::addTheme(const QString &title, const QString &alias, const int &i
         return false;
 
     themes.insert(th->alias, th);
-    addData(writeXMLConfig(), "questions.xml");
+    //addData(writeXMLConfig(), "questions.xml");
 
     themes_model->insertRow(row);
     themes_model->setData(themes_model->index(row, 0), title, Qt::DisplayRole);
@@ -420,7 +489,7 @@ void SProject::removeTheme(const QString &alias) {
     {
         themes_model->removeRow(themes[alias]->row);
         themes.remove(alias);
-        addData(writeXMLConfig(), "questions.xml");
+        //addData(writeXMLConfig(), "questions.xml");
         emit themeRemoved(alias);
     }
 }
@@ -471,19 +540,45 @@ QByteArray SProject::writeXMLConfig(const QDomElement &question) {
     test.setAttribute("version", "depot1");
 
     QDomElement themesElement = document.createElement("themes");
+    themesElement.setAttribute("thmes_counter", thmes_counter);
 
     foreach (theme *th, themes) {
         QDomElement themeElement = document.createElement("theme");
         themeElement.setAttribute("title", th->name);
         themeElement.setAttribute("alias", th->alias);
         themeElement.setAttribute("row", th->row);
+        if(!th->questions.isEmpty()) {
+            foreach (QString quest, th->questions) {
+                QDomElement quest_thElement = document.createElement("question");
+                quest_thElement.appendChild(document.createTextNode(quest));
+                themeElement.appendChild(quest_thElement);
+            }
+        }
         themesElement.appendChild(themeElement);
     }
+    QDomElement questionsElement = document.createElement("questions");
+    register int questCount = questionsCount();
+    questionsElement.setAttribute("questCount", questCount);
+    for (int i = 0; i < questCount; i++) {
+        QDomElement questElement = makeElement(quest_model->data(quest_model->index(i, 3)).toString());
+        questionsElement.appendChild(questElement);
+    }
+
+    QDomElement resourcesElement = document.createElement("reg_resources");
+    foreach (reg_resource *rc, registered_resources) {
+        QDomElement resElement = document.createElement("resource");
+        resElement.setAttribute("question", rc->questionAlias);
+        resElement.appendChild(document.createTextNode(rc->resourceAlias));
+    }
     test.appendChild(themesElement);
+    test.appendChild(questionsElement);
+    test.appendChild(resourcesElement);
     document.appendChild(test);
 
     QTextStream stream(&res);
     document.save(stream, 3);
+
+    qDebug() << res;
 
     return res;
 }
@@ -703,4 +798,19 @@ QStringList SProject::resourcesForQuestion(const QString &questAlias) {
             list.append(rc->resourceAlias);
     }
     return list;
+}
+
+QDomElement SProject::makeElement(const QString &xml_string) {
+    QDomDocument doc;
+    QString err;
+    int errLine, errColumn;
+    if(!doc.setContent(xml_string, &err, &errLine, &errColumn)) {
+        error(tr("%1\nLine: %1\nColumn: %3")
+              .arg(err)
+              .arg(errLine)
+              .arg(errColumn));
+        return QDomElement();
+    }
+
+    return doc.documentElement();
 }

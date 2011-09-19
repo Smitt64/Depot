@@ -175,20 +175,22 @@ QDockWidget *CMainWindow::addDockPanel(const QString &title, const QString &name
 void CMainWindow::makeFileMenu(const bool &withToolBar) {
     if(!fileMenu) {
         fileMenu = addMenu(tr("File"), "File");
-        QAction *fileNew = addAction(tr("New"), "new", "File", QIcon(":/new"));
+
+
+        QAction *fileNew = addAction(tr("New"), "new", "File", QIcon::fromTheme("document-new"));
         fileNew->setStatusTip(tr("Create new file..."));
         fileNew->setShortcut(QKeySequence::New);
 
-        QAction *fileOpen = addAction(tr("Open..."), "open", "File", QIcon(":/open"));
+        QAction *fileOpen = addAction(tr("Open..."), "open", "File", QIcon::fromTheme("document-open"));
         fileOpen->setStatusTip(tr("Open exist file..."));
         fileOpen->setShortcut(QKeySequence::Open);
 
-        QAction *fileSave = addAction(tr("Save..."), "save", "File", QIcon(":/save"));
+        QAction *fileSave = addAction(tr("Save..."), "save", "File", QIcon::fromTheme("document-save"));
         fileSave->setEnabled(false);
         fileSave->setStatusTip(tr("Save changes..."));
         fileSave->setShortcut(QKeySequence::Save);
 
-        QAction *fileSaveAs = addAction(tr("Save as..."), "saveas", "File", QIcon(":/saveall"));
+        QAction *fileSaveAs = addAction(tr("Save as..."), "saveas", "File", QIcon::fromTheme("document-save-as"));
         fileSaveAs->setEnabled(false);
         fileSaveAs->setStatusTip(tr("Save as new file..."));
         fileSaveAs->setShortcut(QKeySequence::SaveAs);
@@ -215,12 +217,12 @@ void CMainWindow::makeEditMenu() {
         return;
 
     editMenu = addMenu(tr("Edit"), "Edit");
-    QAction *undo_action = addAction(tr("Undo"), "undo", "Edit", QIcon(":/undo"));
+    QAction *undo_action = addAction(tr("Undo"), "undo", "Edit", QIcon::fromTheme("edit-undo"));
     undo_action->setShortcut(QKeySequence::Undo);
     undo_action->setStatusTip(tr("Cancellation of last action..."));
     undo_action->setEnabled(false);
 
-    QAction *redo_action = addAction(tr("Redo"), "redo", "Edit", QIcon(":/redo"));
+    QAction *redo_action = addAction(tr("Redo"), "redo", "Edit", QIcon::fromTheme("edit-undo"));
     redo_action->setShortcut(QKeySequence::Redo);
     redo_action->setStatusTip(tr("Repeated performance of last action..."));
     redo_action->setEnabled(false);
@@ -349,6 +351,14 @@ QList<QAction*> CMainWindow::actionList() {
         list.append(sactions[ac[i]]);
     }
     return list;
+}
+
+void CMainWindow::removeAction(const QString &name) {
+
+    if(sactions.contains(name)) {
+        QAction *action = sactions[name];
+        sactions.remove(name);
+    }
 }
 
 void CMainWindow::customizeDlgClosed(int result) {   

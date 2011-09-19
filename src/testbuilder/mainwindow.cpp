@@ -11,6 +11,7 @@
 #include "questionsmodel.h"
 #include "dialogs/editquestion.h"
 #include "dialogs/edittheme.h"
+#include "dialogs/xmlconfigdialog.h"
 #include "shelpcontentviewwidget.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -18,7 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :
     commandsHistory(NULL),
     tst_struct(NULL),
     theme_item(NULL),
-    mdiArea(NULL)
+    mdiArea(NULL),
+    MaxRecentFiles(5)
 {
     mdiArea = new QMdiArea(this);
     mdiArea->setDocumentMode(false);
@@ -37,12 +39,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     theme_mehu = addMenu(tr("Theme"), "theme");
     QAction *add_theme = addAction(tr("Add theme"), "add_theme", "theme",
-                                   QIcon(":/addtheme"));
+                                   QIcon::fromTheme("test-add-theme"));
     add_theme->setStatusTip(tr("Adding new theme to test..."));
     add_theme->setEnabled(false);
 
     QAction *rem_theme = addAction(tr("Remove theme"), "remove_theme", "theme",
-                                   QIcon(":/removetheme"));
+                                   QIcon::fromTheme("test-remove_theme"));
     rem_theme->setStatusTip(tr("Removing current theme..."));
     rem_theme->setEnabled(false);
 
@@ -52,14 +54,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     quest_menu = addMenu(tr("Question"), "quest_menu");
     QAction *add_quest = addAction(tr("Add question"), "add_quest", "quest_menu",
-                                   QIcon(":/add_quest"));
+                                   QIcon::fromTheme("test-add-question"));
     add_quest->setStatusTip(tr("Adding new question..."));
     add_quest->setEnabled(false);
 
     QAction *rem_quest = addAction(tr("Remove question"), "rem_quest", "quest_menu",
-                                   QIcon(":/removeQuestion"));
+                                   QIcon::fromTheme("test-remove_question"));
     rem_quest->setStatusTip(tr("Removing current question..."));
     rem_quest->setEnabled(false);
+
+    test_menu = addMenu(tr("Test"), "test");
+    QAction *viewTestXML = addAction(tr("Test config file"), "tst_config_XML", "test", QIcon(":/xml_file"));
+    viewTestXML->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_C));
 
     commandsHistory = new QUndoView(S_PROJECT->undoStack());
     commandsHistory->setEmptyLabel(tr("<empty>"));
@@ -71,7 +77,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     tst_struct = new QTreeWidget;
     tst_struct->setContextMenuPolicy(Qt::CustomContextMenu);
-    QDockWidget *test_struct = addDockPanel(tr("Test struct"), "tst_struct", QIcon(":/book"));
+    QDockWidget *test_struct = addDockPanel(tr("Test struct"), "tst_struct", QIcon::fromTheme("test-book"));
 
     test_struct->setWidget(tst_struct);
     tst_struct->setEnabled(false);
@@ -91,13 +97,27 @@ MainWindow::MainWindow(QWidget *parent) :
 
     makeServiceMenu();
 
+    //Recent file list
+    MaxRecentFiles = SApplication::inst()->settings("window/max_recent_files", 5).toInt();
+    separatorAct = new QAction(this);
+    separatorAct->setSeparator(true);
+    separatorAct->setVisible(true);
+    addAction(separatorAct, "separatorAct", "File");
+    for (int i = 0; i < MaxRecentFiles; ++i) {
+        recentFileActs.append(addAction("", QString("recent_%1")
+                                      .arg(i), "File"));
+        recentFileActs[i]->setVisible(false);
+        connect(recentFileActs[i], SIGNAL(triggered()),
+                this, SLOT(openRecentFile()));
+    }
+    updateRecentFileActions();
+
     restore();
 
     QTableView *table = new QTableView;
     table->setModel(S_PROJECT->questions());
     QMdiSubWindow *subWindow2 = mdiArea->addSubWindow(table);
     subWindow2->setAttribute(Qt::WA_DeleteOnClose);
-    //subWindow2->showMaximized();
 
     connect(create, SIGNAL(triggered()), this, SLOT(createProject()));
     connect(open, SIGNAL(triggered()), this, SLOT(openProject()));
@@ -120,11 +140,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(S_PROJECT, SIGNAL(error(QString)), this, SLOT(debugOutput(QString)));
     connect(S_PROJECT, SIGNAL(modifyChanged(bool)), this, SLOT(projectModifyed(bool)));
     connect(this, SIGNAL(destroyed()), S_PROJECT, SLOT(close()));
+    connect(S_PROJECT, SIGNAL(projectClosed()), this, SLOT(projectClosed()));
 
     connect(S_PROJECT, SIGNAL(questionAdded(QString,QString,QStringList)), this,
             SLOT(questionAdded(QString,QString,QStringList)));
     connect(S_PROJECT, SIGNAL(questionRemoved(QString,QStringList)), this,
             SLOT(questRemoved(QString,QStringList)));
+    connect(viewTestXML, SIGNAL(triggered()), this, SLOT(showTestConfig()));
 }
 
 void MainWindow::createProject() {
@@ -158,31 +180,24 @@ void MainWindow::saveProject() {
 
 void MainWindow::updateTestStruct() {
     QTreeWidgetItem *top = new QTreeWidgetItem;
-    top->setIcon(0, QIcon(":/book"));
+    top->setIcon(0, QIcon::fromTheme("test-book"));
     top->setText(0, tr("Test"));
     tst_struct->addTopLevelItem(top);
 
     theme_item = new QTreeWidgetItem;
     theme_item->setText(0, tr("Themes"));
-    theme_item->setIcon(0, QIcon(":/themegroup"));
+    theme_item->setIcon(0, QIcon::fromTheme("test-theme_group"));
     top->addChild(theme_item);
 }
 
 void MainWindow::closeProject() {
     S_PROJECT->close();
-    SApplication::inst()->writeSettings("window/tst_struct_header", tst_struct->header()->saveState());
-    tst_struct->clear();
-    tst_struct->setEnabled(false);
-    commandsHistory->setEnabled(false);
-    action("close")->setEnabled(false);
-    action("undo")->setEnabled(false);
-    action("redo")->setEnabled(false);
-    action("add_theme")->setEnabled(false);
-    action("remove_theme")->setEnabled(false);
-    action("add_quest")->setEnabled(false);
 }
 
 void MainWindow::tstSctructCurItemChanged(QTreeWidgetItem *cur, QTreeWidgetItem *prev) {
+    if(!cur)
+        return;
+
     if(cur->data(0, Qt::UserRole + 1).toString() == "theme") {
         action("remove_theme")->setEnabled(true);
         action("edit_theme")->setEnabled(true);
@@ -227,7 +242,7 @@ void MainWindow::themeAdded(QString title, QString alias) {
     QTreeWidgetItem *item = new QTreeWidgetItem;
     item->setText(0, title);
     item->setText(1, alias);
-    item->setIcon(0, QIcon(":/theme"));
+    item->setIcon(0, QIcon::fromTheme("test-theme"));
     item->setToolTip(0, QString(tr("<P><B>Theme: </B>%1</P><B>Alias: </B>%2"))
                      .arg(title, alias));
     item->setData(0, Qt::UserRole, alias);
@@ -270,6 +285,7 @@ void MainWindow::addQuestion() {
 
 void MainWindow::questionAdded(QString alias, QString label, QStringList toThemes) {
     int thCount = theme_item->childCount();
+    qDebug() << toThemes;
     for(int i = 0; i < thCount; i++) {
         QTreeWidgetItem *child = theme_item->child(i);
         QString themeAlias = child->text(1);
@@ -277,7 +293,7 @@ void MainWindow::questionAdded(QString alias, QString label, QStringList toTheme
             QTreeWidgetItem *item = new QTreeWidgetItem;
             item->setText(0, label);
             item->setText(1, alias);
-            item->setIcon(0, QIcon(":/quest"));
+            item->setIcon(0, QIcon::fromTheme("test-question"));
             item->setToolTip(0, tr("<P><B>Question: </B>%1</P>"
                                    "<B>Alias: </B>%2"
                                    "<P><B>Type: </B>%3</P>")
@@ -309,14 +325,8 @@ void MainWindow::questRemoved(QString qAlias, QStringList fromThemes) {
     }
 }
 
-void MainWindow::openProject() {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Opening test..."),
-                                                    "", tr("Test files (*.tst)"));
-
-    if(fileName.isEmpty() )
-        return;
-
-    setWindowFilePath(fileName);
+void MainWindow::openDocument(const QString &fileName) {
+    setCurrentFile(fileName);
     commandsHistory->setStack(S_PROJECT->undoStack());
     commandsHistory->setEnabled(true);
     tst_struct->setEnabled(true);
@@ -327,6 +337,16 @@ void MainWindow::openProject() {
     updateTestStruct();
 
     S_PROJECT->openProject(fileName);
+}
+
+void MainWindow::openProject() {
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Opening test..."),
+                                                    "", tr("Test files (*.tst)"));
+
+    if(fileName.isEmpty() )
+        return;
+
+    openDocument(fileName);
 }
 
 void MainWindow::tstStructContextMenu(QPoint pos) {
@@ -347,10 +367,80 @@ void MainWindow::tstStructContextMenu(QPoint pos) {
 }
 
 void MainWindow::projectModifyed(bool value) {
-    action("close")->setEnabled(value);
-    action("save")->setEnabled(value);
+    action("close")->setEnabled(!value);
+    action("save")->setEnabled(!value);
+}
+
+void MainWindow::projectClosed() {
+    SApplication::inst()->writeSettings("window/tst_struct_header", tst_struct->header()->saveState());
+    tst_struct->clear();
+    tst_struct->setEnabled(false);
+    commandsHistory->setEnabled(false);
+    action("close")->setEnabled(false);
+    action("undo")->setEnabled(false);
+    action("redo")->setEnabled(false);
+    action("add_theme")->setEnabled(false);
+    action("remove_theme")->setEnabled(false);
+    action("add_quest")->setEnabled(false);
+}
+
+void MainWindow::showTestConfig() {
+    XmlConfigDialog tst_conf(this);
+    int hret = tst_conf.exec();
+    Q_UNUSED(hret);
 }
 
 void MainWindow::debugOutput(QString msg) {
     qDebug() << msg;
+}
+
+void MainWindow::updateRecentFileActions() {
+    QSettings settings;
+    MaxRecentFiles = SApplication::inst()->settings("window/max_recent_files", 5).toInt();
+    QStringList files = settings.value("window/recent_file_list").toStringList();
+
+    int numRecentFiles = qMin(files.size(), (int)MaxRecentFiles);
+
+    if(numRecentFiles < recentFileActs.count()) {
+        for(int i = recentFileActs.count() - 1; i > numRecentFiles; i--) {
+            QAction *action = recentFileActs.at(i);
+            removeAction(action->data().toString());
+            recentFileActs.removeAt(i);
+        }
+    }
+
+    for(int i = 0; i < numRecentFiles; i++) {
+        QString text = tr("&%1 %2").arg(i + 1)
+                .arg(QFileInfo(files[i]).fileName());
+        recentFileActs[i]->setText(text);
+        recentFileActs[i]->setData(files[i]);
+        recentFileActs[i]->setVisible(true);
+    }
+    separatorAct->setVisible(numRecentFiles > 0);
+}
+
+void MainWindow::setCurrentFile(const QString &fileName) {
+    curFile = fileName;
+    setWindowFilePath(curFile);
+
+    QStringList files = SApplication::inst()->settings("window/recent_file_list").toStringList();
+    files.removeAll(fileName);
+    files.prepend(fileName);
+    while (files.size() > MaxRecentFiles)
+        files.removeLast();
+
+    SApplication::inst()->writeSettings("window/recent_file_list", files);
+
+    foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+        MainWindow *mainWin = qobject_cast<MainWindow *>(widget);
+        if (mainWin)
+            mainWin->updateRecentFileActions();
+    }
+}
+
+void MainWindow::openRecentFile() {
+    QAction *action = qobject_cast<QAction*>(sender());
+
+    if(action)
+        openDocument(action->data().toString());
 }

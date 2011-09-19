@@ -146,6 +146,7 @@ void ClosedTestEditor::makeQuestionConfig(QDomElement *questElement,
 
     int checksCount = 0;
     QString questAlias = questElement->attribute("alias", QString::null);
+    questElement->setAttribute("label", text_editor->plainText().left(10));
 
     if(questAlias.isNull())
         return;

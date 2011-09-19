@@ -17,7 +17,7 @@
 
 class SApplication {
 public:
-    SApplication(int argc, char **args);
+    SApplication(int argc, char *args[]);
     ~SApplication();
 
     static SApplication *inst();
@@ -34,6 +34,7 @@ public:
 
     QObject *project();
     QByteArray helpData(QString name);
+    QHelpEngine *assistantEngine();
     QWidget *helpViewWidget(bool makeControls = false);
 
 private:

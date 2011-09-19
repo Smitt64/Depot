@@ -106,10 +106,14 @@ void SToolBar::paintEvent(QPaintEvent *event) {
             positioner.load(":/insert_at");
         } else {
             QPixmap tmp(":/insert_at");
-            positioner = QPixmap(tmp.height(), tmp.width());
+            positioner = QPixmap(event->rect().width(), tmp.width());
+            positioner.fill(Qt::red);
             QPainter posPaint(&positioner);
+            posPaint.save();
+            posPaint.translate(positioner.width() / 2, 0);
             posPaint.rotate(90);
-            posPaint.drawPixmap(0, 0, tmp);
+            posPaint.drawPixmap(0, -positioner.width() / 2, tmp);
+            posPaint.restore();
         }
 
         painter.drawPixmap(0, 0, grabed);

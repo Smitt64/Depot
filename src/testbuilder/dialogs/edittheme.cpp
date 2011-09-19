@@ -43,6 +43,7 @@ EditThemeDlg::EditThemeDlg(QWidget *parent) :
     setLayout(form);
 
     quests->setModel(S_PROJECT->questions());
+    quests->setModelColumn(0);
 
     connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));

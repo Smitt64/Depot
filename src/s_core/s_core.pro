@@ -48,7 +48,19 @@ SOURCES = sapplication.cpp \
     msstyle/windowsmodernstyle.cpp \
     filesystemobject.cpp
 
-RESOURCES += \
-    ../../res/s_core_res.qrc
+RESOURCES +=
 
 DEFINES += FS_DEBUG
+
+OTHER_FILES += \
+    ../../res/Depot_XP/index.theme
+
+
+
+
+
+
+
+
+
+

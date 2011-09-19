@@ -1,10 +1,10 @@
-﻿#include "sapplication.h"
+#include <QtGui/QApplication>
 #include "mainwindow.h"
-#include <QTranslator>
+#include "sapplication.h"
 
-int main(int argc, char **args)
+int main(int argc, char *argv[])
 {
-    SApplication a(argc, args);
+    SApplication a(argc, argv);
 
     QTranslator tr;
     tr.load("depot_ru_RU");
@@ -12,10 +12,9 @@ int main(int argc, char **args)
 
     if(QApplication::startingUp())
         return 0x01;
-    //a.app()->setStyle("WindowsModernStyle");
+
     a.setResourcePackage("./data.sarc");
 
-    QIcon::setThemeName("Depot_XP");
     MainWindow w;
     w.show();
 

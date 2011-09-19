@@ -72,7 +72,7 @@ void SActionListWidget::mousePressEvent(QMouseEvent *event) {
     if(!index.isValid())
         return;
 
-    QByteArray data = index.data(Qt::UserRole + 1).toByteArray();
+    QByteArray data = index.data(Qt::UserRole).toByteArray();
 
     QMimeData *mimeData = new QMimeData;
     mimeData->setData("actions/x-actiondata", data);

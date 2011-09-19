@@ -31,6 +31,8 @@ public:
     QAction *addAction(const QString &title, const QString &name, const QString &menu = "", const QIcon &icon = QIcon());
     QAction *addAction(QAction *action, const QString &name, const QString &menu = "");
     QDockWidget *addDockPanel(const QString &title, const QString &name, const QIcon &icon = QIcon());
+
+    void removeAction(const QString &name);
     void makeFileMenu(const bool &withToolBar = true);
     void makeEditMenu();
     void makeViewMenu();

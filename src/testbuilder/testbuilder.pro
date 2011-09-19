@@ -10,15 +10,8 @@ UI_DIR = .build
 
 INCLUDEPATH = ../s_core/
 
-#debug: {
-    LIBS = ../../bin/libs_core.a
-    DESTDIR = ../../bin
-#}
-
-#release: {
-    #LIBS = ../../bin/release/libs_core.a
-#    DESTDIR = ../../bin/release/
-#}
+LIBS = ../../bin/libs_core.a
+DESTDIR = ../../bin
 
 #install
 #target.path = ../../bin/
@@ -28,9 +21,17 @@ INCLUDEPATH = ../s_core/
 SOURCES = main.cpp \
     mainwindow.cpp \
     dialogs/edittheme.cpp \
-    dialogs/editquestion.cpp
+    dialogs/editquestion.cpp \
+    xmlsyntaxhighlighter.cpp \
+    dialogs/xmlconfigdialog.cpp
 
 HEADERS += \
     mainwindow.h \
     dialogs/edittheme.h \
-    dialogs/editquestion.h
+    dialogs/editquestion.h \
+    xmlsyntaxhighlighter.h \
+    dialogs/xmlconfigdialog.h
+
+
+
+
