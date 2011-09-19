@@ -1,0 +1,22 @@
+[Icon Theme]
+Name=Depot
+Comment=Windows XP default application icons
+Comment[ru]=Windows XP иконки приложений по умолчанию
+Inherits=wood,default
+Directories=apps,actions,objects
+
+[apps]
+Size=16
+Type=Fixed
+Context=Applications
+
+[actions]
+Size=16
+Type=Fixed
+Context=Actions
+
+[objects]
+Size=16
+Type=Fixed
+Context=Applications
+
