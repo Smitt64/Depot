@@ -1,6 +1,7 @@
 ﻿#ifndef SPROJECT_H
 #define SPROJECT_H
 
+#include "s_core_global.h"
 #include <QObject>
 #include <QDomElement>
 #include <QUndoStack>
@@ -32,7 +33,7 @@ typedef struct {
     QString resourceAlias;
 } reg_resource;
 
-class SProject : public QObject
+class S_CORESHARED_EXPORT SProject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool in_redactor_mode READ isRedactorMode WRITE setRedactorMode)
@@ -105,15 +106,11 @@ public slots:
     bool saveProject();
 
 private:
-    //QByteArray writeXMLConfig(const QDomElement &questionConf = QDomElement());
     QModelIndex questTypeIndex(const QString &typeName);
     QDomElement makeElement(const QString &xml_string);
-    //int fileArchive(const QString &filename);
-    //bool moveData(const QString &filename, int from = 1, int to = 0);
     int canClose();
 
     bool redactor_mode;
-    //FSHANDLE *file_handle, *temp_handle;
     QUndoStack *undo_stack;
     QMap<QString, theme*> themes;
     QList<reg_resource*> registered_resources;

@@ -2,7 +2,10 @@
 #include "sapplication.h"
 #include "sproject.h"
 #include "scombobox.h"
+
+#ifndef S_OS_MEEGO
 #include "shelpcontentviewwidget.h"
+#endif
 
 EditQuestionDlg::EditQuestionDlg(QWidget *parent) :
     QDialog(parent)
@@ -103,6 +106,7 @@ QStringList EditQuestionDlg::selectedThemes() {
     return ((SComboBox*)groups_box)->selectedItems();
 }
 
+#ifndef S_OS_MEEGO
 void EditQuestionDlg::showHelp() {
     QDialog *dlg = new QDialog(this);
     dlg->setWindowModality(Qt::NonModal);
@@ -111,6 +115,7 @@ void EditQuestionDlg::showHelp() {
     dlg->setLayout(form);
     dlg->show();
 }
+#endif
 
 int EditQuestionDlg::getResCount() {
     return editor->getResCount();

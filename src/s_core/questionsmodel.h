@@ -1,10 +1,11 @@
 #ifndef QUESTIONSMODEL_H
 #define QUESTIONSMODEL_H
 
+#include "s_core_global.h"
 #include <QStandardItemModel>
 #include <QDomElement>
 
-class QuestionsModel : public QStandardItemModel
+class S_CORESHARED_EXPORT QuestionsModel : public QStandardItemModel
 {
     Q_OBJECT
 public:

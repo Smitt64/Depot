@@ -1,9 +1,10 @@
 #ifndef SCOMBOBOX_H
 #define SCOMBOBOX_H
 
+#include "s_core_global.h"
 #include <QComboBox>
 
-class SComboBox : public QComboBox
+class S_CORESHARED_EXPORT SComboBox : public QComboBox
 {
     Q_OBJECT
 public:

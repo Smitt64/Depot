@@ -1,6 +1,6 @@
 ﻿#include "sapplication.h"
 #include "mainwindow.h"
-#include <QTranslator>
+//#include <QTranslator>
 
 int main(int argc, char **args)
 {
@@ -16,8 +16,12 @@ int main(int argc, char **args)
     a.setResourcePackage("./data.sarc");
 
     QIcon::setThemeName("Depot_XP");
+    qDebug() << "Create main window";
     MainWindow w;
+    qDebug() << "Show main window";
     w.show();
+            //.showExpanded();
+    qDebug() << "end show main window";
 
     a.setMainWindow(&w);
 

@@ -1,10 +1,11 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+#include "s_core_global.h"
 #include <QUndoCommand>
 #include <QStringList>
 
-class addThemeCommand : public QUndoCommand
+class S_CORESHARED_EXPORT addThemeCommand : public QUndoCommand
 {
 public:
     addThemeCommand(const QString &title, QUndoCommand *parent = 0);
@@ -16,7 +17,7 @@ private:
     int row;
 };
 
-class removeThemeCommand : public QUndoCommand
+class S_CORESHARED_EXPORT removeThemeCommand : public QUndoCommand
 {
 public:
     removeThemeCommand(const QString &alias, QUndoCommand *parent = 0);
@@ -29,7 +30,7 @@ private:
 };
 
 
-class addQuestionCommand : public QUndoCommand
+class S_CORESHARED_EXPORT addQuestionCommand : public QUndoCommand
 {
 public:
     addQuestionCommand(const QString &type, const QString &alias,

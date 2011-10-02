@@ -12,22 +12,32 @@
 #include "dialogs/editquestion.h"
 #include "dialogs/edittheme.h"
 #include "dialogs/xmlconfigdialog.h"
+
+#ifndef S_OS_MEEGO
 #include "shelpcontentviewwidget.h"
+#endif
 
 MainWindow::MainWindow(QWidget *parent) :
     CMainWindow(parent),
+#ifndef S_OS_MEEGO
     commandsHistory(NULL),
+#endif
     tst_struct(NULL),
     theme_item(NULL),
     mdiArea(NULL),
-    MaxRecentFiles(5)
+    MaxRecentFiles(5),
+    theme_mehu(NULL)
 {
     mdiArea = new QMdiArea(this);
     mdiArea->setDocumentMode(false);
     mdiArea->setViewMode(QMdiArea::TabbedView);
+
+#ifndef S_OS_MEEGO
     QMdiSubWindow *subWindow = mdiArea->addSubWindow(SApplication::inst()->helpViewWidget());
     subWindow->setAttribute(Qt::WA_DeleteOnClose);
     subWindow->showMaximized();
+#endif
+
     setCentralWidget(mdiArea);
 
     setWindowTitle(tr("TestBuiler"));
@@ -114,10 +124,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     restore();
 
-    QTableView *table = new QTableView;
+    /*QTableView *table = new QTableView;
     table->setModel(S_PROJECT->questions());
     QMdiSubWindow *subWindow2 = mdiArea->addSubWindow(table);
-    subWindow2->setAttribute(Qt::WA_DeleteOnClose);
+    subWindow2->setAttribute(Qt::WA_DeleteOnClose);*/
 
     connect(create, SIGNAL(triggered()), this, SLOT(createProject()));
     connect(open, SIGNAL(triggered()), this, SLOT(openProject()));

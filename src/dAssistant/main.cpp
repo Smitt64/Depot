@@ -21,4 +21,5 @@ int main(int argc, char *argv[])
     a.setMainWindow(&w);
 
     return a.app()->exec();
+    return 0;
 }

@@ -49,9 +49,11 @@ private:
     QList<QAction*> recentFileActs;
     int MaxRecentFiles;
     QAction *separatorAct;
-    QUndoView *commandsHistory;
     QTreeWidget *tst_struct;
+#ifndef S_OS_MEEGO
     QComboBox *helpSearch;
+    QUndoView *commandsHistory;
+#endif
     QMenu *theme_mehu, *quest_menu, *test_menu;
     QTreeWidgetItem *theme_item;
     QMdiArea *mdiArea;

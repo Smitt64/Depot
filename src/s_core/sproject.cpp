@@ -107,21 +107,11 @@ bool SProject::create(const QString &filename) {
             return false;
         }
     }
-    /*file_handle = new FSHANDLE;
-    if(!(hr = FileSystem::getInst()->fsCreate(filename, file_handle)))
-    {
-        FileSystem::getInst()->fsClose(file_handle);
-        return false;
-    }
-    FileSystem::getInst()->fsClose(file_handle);*/
     //Test file
-    qDebug() << "addArchive" << fsManager->addArchive(filename, true);
+    fsManager->addArchive(filename, true);
     //Temp test file
     fsManager->addArchive(QString("%1/~%2")
                           .arg(QDir::tempPath(), QFileInfo(filename).fileName()));
-
-    //temp_handle->archFName = ;
-    //FileSystem::getInst()->fsCreate(temp_handle->archFName, temp_handle);
 
     QDomDocument document("DepotTest");
     QDomElement test = document.createElement("test");
@@ -136,16 +126,6 @@ bool SProject::create(const QString &filename) {
     QTextStream stream(&qdata);
     document.save(stream, 3);
 
-    /*if(!FileSystem::getInst()->fsOpen(file_handle)) {
-        FileSystem::getInst()->fsClose(file_handle);
-        return false;
-    }
-    if(!FileSystem::getInst()->fsAddFile(data,"questions.xml", file_handle)) {
-        FileSystem::getInst()->fsClose(file_handle);
-        return false;
-    }
-
-    FileSystem::getInst()->fsClose(file_handle);*/
     return fsManager->addFile(qdata, "questions.xml");
 }
 
@@ -220,7 +200,6 @@ bool SProject::openProject(const QString &filename) {
         QString qType = element.attribute("type");
         QString qAlias = element.attribute("alias");
         QString qLabel = (element.attribute("label").isNull() ? qAlias : element.attribute("label"));
-                //(element.text().isNull() ? QString() : element.text());
         QStringList list;
         foreach (theme *th, themes) {
             if(th->questions.contains(qAlias))
@@ -230,28 +209,17 @@ bool SProject::openProject(const QString &filename) {
         xmlQuery.setQuery(QString("doc($document)/test/questions/question[@alias=\"%1\"]")
                           .arg(qAlias));
         xmlQuery.evaluateTo(&settings);
-
-        qDebug() << settings << list;
         addQuestion(qType, qAlias, settings.toLocal8Bit(), list, qLabel);
     }
     return true;
 }
 
 bool SProject::saveProject() {
-    /*if(!FileSystem::getInst()->fsOpen(temp_handle)) {
-        FileSystem::getInst()->fsClose(temp_handle);
-        return false;
-    }*/
 
     fsManager->addFile(writeXMLConfig(), "questions.xml");
     foreach (reg_resource *rc, registered_resources) {
-        qDebug() << fsManager->moveFile(rc->resourceAlias, 1, 0);
+        fsManager->moveFile(rc->resourceAlias, 1, 0);
     }
-    /*foreach (File file, temp_handle->fileList) {
-        //moveData(file.m_pName);
-        fsManager->moveFile(file.m_pName, 1, 0);
-    }*/
-    qDebug() << "moveFile" << fsManager->moveFile("questions.xml", 1, 0);
     undo_stack->clear();
     return true;
 }
@@ -277,126 +245,16 @@ int SProject::canClose() {
 }
 
 QByteArray SProject::readData(const QString &filename) {
-    /*if(!FileSystem::getInst()->fsOpen(file_handle)) {
-        FileSystem::getInst()->fsClose(file_handle);
-        return QByteArray();
-    } else {
-        if(!FileSystem::getInst()->fsHasFile(filename, file_handle)) {
-            FileSystem::getInst()->fsClose(file_handle);
-            if(!redactor_mode && !FileSystem::getInst()->fsOpen(temp_handle)) {
-                FileSystem::getInst()->fsClose(temp_handle);
-                return QByteArray();
-            }
-
-            if(!FileSystem::getInst()->fsHasFile(filename, temp_handle)) {
-                FileSystem::getInst()->fsClose(temp_handle);
-                return QByteArray();
-            }
-
-            QByteArray data = FileSystem::getInst()->fsGetFile(filename, temp_handle);
-            FileSystem::getInst()->fsClose(temp_handle);
-            return data;
-        }
-
-        QByteArray data = FileSystem::getInst()->fsGetFile(filename, file_handle);
-        FileSystem::getInst()->fsClose(file_handle);return data;
-    }*/
     return fsManager->fileData(filename);
 }
 
 bool SProject::addData(QByteArray s_data, const QString &filename) {
-    /*if(!FileSystem::getInst()->fsOpen(temp_handle)) {
-        FileSystem::getInst()->fsClose(temp_handle);
-        return false;
-    }
-
-    bool hr;
-    if(!FileSystem::getInst()->fsHasFile(filename, temp_handle)) {
-        hr = FileSystem::getInst()->fsAddFile(s_data, filename, temp_handle);
-    } else {
-        FileSystem::getInst()->fsDelete(filename, temp_handle);
-        hr = FileSystem::getInst()->fsAddFile(s_data, filename, temp_handle);
-    }
-    FileSystem::getInst()->fsClose(temp_handle);
-    return hr;*/
     return fsManager->addFile(s_data, filename);
 }
 
 bool SProject::hasData(const QString &filename) {
-    /*if(!FileSystem::getInst()->fsOpen(file_handle)) {
-        FileSystem::getInst()->fsClose(file_handle);
-        return false;
-    }
-    if(!FileSystem::getInst()->fsHasFile(filename, file_handle)) {
-        FileSystem::getInst()->fsClose(file_handle);
-        if(!redactor_mode || !FileSystem::getInst()->fsOpen(temp_handle)) {
-            FileSystem::getInst()->fsClose(temp_handle);
-            return false;
-        }
-FileSystem::getInst()->fsOpen(temp_handle);
-        if(!FileSystem::getInst()->fsHasFile(filename, temp_handle)) {
-            FileSystem::getInst()->fsClose(temp_handle);
-            return false;
-        }*/
-    //}
     return fsManager->hasFile(filename);
 }
-
-/*int SProject::fileArchive(const QString &filename) {
-    if(!FileSystem::getInst()->fsOpen(file_handle)) {
-        FileSystem::getInst()->fsClose(file_handle);
-        return -1;
-    }
-    if(!FileSystem::getInst()->fsHasFile(filename, file_handle)) {
-        FileSystem::getInst()->fsClose(file_handle);
-        if(!redactor_mode && !FileSystem::getInst()->fsOpen(temp_handle)) {
-            FileSystem::getInst()->fsClose(temp_handle);
-            return -1;
-        }
-
-        if(!FileSystem::getInst()->fsHasFile(filename, temp_handle)) {
-            FileSystem::getInst()->fsClose(temp_handle);
-            return -1;
-        } else
-            return 1;
-    } else
-        return 0;
-    return -1;
-}
-
-bool SProject::moveData(const QString &filename, int from, int to) {
-    if(from == to)
-        return false;
-
-    FSHANDLE *archFrom = (from == 1 ? temp_handle : file_handle);
-    FSHANDLE *archTo = (to == 1 ? temp_handle : file_handle);
-
-    if(!FileSystem::getInst()->fsOpen(archFrom) ||
-            !FileSystem::getInst()->fsOpen(archTo)) {
-        FileSystem::getInst()->fsClose(archFrom);
-        FileSystem::getInst()->fsClose(archTo);
-        return false;
-    }
-
-    if(!FileSystem::getInst()->fsHasFile(filename, archFrom)) {
-        FileSystem::getInst()->fsClose(archFrom);
-        FileSystem::getInst()->fsClose(archTo);
-        return false;
-    }
-
-    QByteArray fdata = FileSystem::getInst()->fsGetFile(filename, archFrom);
-    if(FileSystem::getInst()->fsHasFile(filename, archTo))
-        FileSystem::getInst()->fsDelete(filename, archTo);
-    if(!FileSystem::getInst()->fsAddFile(fdata, filename, archTo)) {
-        FileSystem::getInst()->fsClose(archFrom);
-        FileSystem::getInst()->fsClose(archTo);
-        return false;
-    }
-    FileSystem::getInst()->fsDelete(filename, archFrom);
-    FileSystem::getInst()->fsClose(archFrom);
-    FileSystem::getInst()->fsClose(archTo);
-    return true;
-}*/
 
 QUndoStack *SProject::undoStack() {
     return undo_stack;
@@ -451,7 +309,6 @@ bool SProject::addTheme(const QString &title, const QString &alias, const int &i
         return false;
 
     themes.insert(th->alias, th);
-    //addData(writeXMLConfig(), "questions.xml");
 
     themes_model->insertRow(row);
     themes_model->setData(themes_model->index(row, 0), title, Qt::DisplayRole);
@@ -489,7 +346,6 @@ void SProject::removeTheme(const QString &alias) {
     {
         themes_model->removeRow(themes[alias]->row);
         themes.remove(alias);
-        //addData(writeXMLConfig(), "questions.xml");
         emit themeRemoved(alias);
     }
 }
@@ -578,8 +434,6 @@ QByteArray SProject::writeXMLConfig(const QDomElement &question) {
     QTextStream stream(&res);
     document.save(stream, 3);
 
-    qDebug() << res;
-
     return res;
 }
 
@@ -640,14 +494,14 @@ bool SProject::addQuestion(const QString &type, const QString &name,
     }
     emit questionAdded(complete_name, label, toThemes);
 
-    //quest_data\\%1.dat
     int arch = -1;
-    if((arch = fsManager->hasFile(QString("quest_data\\%1.dat")
-                                  .arg(complete_name))) != -1) {
-        QByteArray qdata;
+    //has question in temp archive
+    QString quest_data_name = QString("quest_data\\%1.dat")
+            .arg(complete_name);
+    if((arch = fsManager->hasFile(quest_data_name)) != -1) {
+        QByteArray qdata = fsManager->fileData(quest_data_name);
         QDataStream stream(qdata);
         stream.setVersion(QDataStream::Qt_4_7);
-        stream.setByteOrder(QDataStream::LittleEndian);
         quint32 magic = -1;
         stream >> magic;
         if(magic == 0xA0B0C0D0) {
@@ -661,6 +515,11 @@ bool SProject::addQuestion(const QString &type, const QString &name,
                 QString rc_alias;
 
                 stream >> arch >> rc_alias;
+                regResource(name, rc_alias);
+
+                //Move file to main test file
+                if(arch == 0)
+                    fsManager->moveFile(rc_alias, 1, 0);
             }
         }
     }
@@ -680,7 +539,6 @@ void SProject::removeQuestion(const QString &name) {
     buf.open(QIODevice::WriteOnly);
     QDataStream stream(&buf);
     stream.setVersion(QDataStream::Qt_4_7);
-    stream.setByteOrder(QDataStream::LittleEndian);
     stream << (quint32)0xA0B0C0D0;
     stream << name;
     QStringList list = resourcesForQuestion(name);
@@ -690,7 +548,6 @@ void SProject::removeQuestion(const QString &name) {
         int arch = fsManager->hasFile(str);
         if(arch == 0)
             fsManager->moveFile(str, 0, 1);
-            //moveData(str, 0, 1);
 
         stream << arch << str;
 

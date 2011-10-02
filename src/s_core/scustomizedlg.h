@@ -1,6 +1,7 @@
 #ifndef SCUSTOMIZEDLG_H
 #define SCUSTOMIZEDLG_H
 
+#include "s_core_global.h"
 #include <QDialog>
 #include <QTabWidget>
 #include <QListWidget>
@@ -14,7 +15,7 @@
 #include <QAbstractItemModel>
 #include "stoolbar.h"
 
-class SActionListItemDelegate : public QStyledItemDelegate
+class S_CORESHARED_EXPORT SActionListItemDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:

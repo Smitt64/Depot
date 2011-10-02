@@ -1,6 +1,7 @@
 ﻿#ifndef SAPPLICATION_H
 #define SAPPLICATION_H
 
+#include "s_core_global.h"
 #include "filesystem.h"
 #include "sproject.h"
 #include "cmainwindow.h"
@@ -10,12 +11,15 @@
 #include <QIcon>
 #include <QDebug>
 #include <QFile>
+
+#ifndef S_OS_MEEGO
 #include <QtHelp/QHelpEngine>
+#endif
 
 #define VERSION "1.0.0"
-#define SAFE_DELETE(p) ({delete p; p = NULL;})
+#define SAFE_DELETE(p) if((p) != NULL) delete(p); (p) = NULL;
 
-class SApplication {
+class S_CORESHARED_EXPORT SApplication {
 public:
     SApplication(int argc, char *args[]);
     ~SApplication();
@@ -33,17 +37,21 @@ public:
     CMainWindow *mainWindow();
 
     QObject *project();
+#ifndef S_OS_MEEGO
     QByteArray helpData(QString name);
     QHelpEngine *assistantEngine();
     QWidget *helpViewWidget(bool makeControls = false);
+#endif
 
 private:
     static SApplication *s_App;
+#ifndef S_OS_MEEGO
     QHelpEngine *helpEngine;
+    QWidget *s_helpView;
+#endif
     QApplication *s_app;
     FSHANDLE *resource;
     QObject *s_project;
-    QWidget *s_helpView;
     CMainWindow *mainWnd;
     QFile *log;
 };

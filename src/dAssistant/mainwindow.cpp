@@ -13,8 +13,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QDockWidget *contentDoc = addDockPanel(tr("Content"), "contentDoc");
     indexDoc->setWidget(indexWidget);
     contentDoc->setWidget(contentWidget);
-
+#ifndef S_OS_MEEGO
     HelpView *w = new HelpView(false);
+#endif
     setCentralWidget((QWidget*)w);
 
     restore();

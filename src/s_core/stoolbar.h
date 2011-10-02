@@ -1,10 +1,11 @@
 #ifndef STOOLBAR_H
 #define STOOLBAR_H
 
+#include "s_core_global.h"
 #include <QToolBar>
 #include <QDragEnterEvent>
 
-class SToolBar : public QToolBar
+class S_CORESHARED_EXPORT SToolBar : public QToolBar
 {
     Q_OBJECT
     Q_PROPERTY(bool isUserBar READ isUser WRITE setUser)

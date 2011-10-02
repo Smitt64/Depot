@@ -1,6 +1,7 @@
 #ifndef STEXTEDITOR_H
 #define STEXTEDITOR_H
 
+#include "s_core_global.h"
 #include "s_texteditwidget.h"
 #include <QDialog>
 #include <QMainWindow>
@@ -9,7 +10,7 @@
 #include <QDialogButtonBox>
 #include <QFontComboBox>
 
-class STextEditorView : public QMainWindow
+class S_CORESHARED_EXPORT STextEditorView : public QMainWindow
 {
     Q_OBJECT
 public:
@@ -55,7 +56,7 @@ private:
     void mergeFormatOnWordOrSelection(const QTextCharFormat &format);
 };
 
-class STextEditor : public QDialog
+class S_CORESHARED_EXPORT STextEditor : public QDialog
 {
     Q_OBJECT
 public:

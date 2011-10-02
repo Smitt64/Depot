@@ -23,9 +23,6 @@ XmlConfigDialog::XmlConfigDialog(QWidget *parent) :
     queryResult->setReadOnly(true);
     new XmlSyntaxHighlighter(queryResult->document());
 
-    //queryLayout->addWidget(queryEdit);
-    //queryLayout->addWidget(execButton);
-    //queryLayout->addWidget(queryResult);
     queryLayout->addRow(tr("XQuery"), queryEdit);
     queryLayout->addWidget(execButton);
     queryLayout->addRow(tr("Query result"), queryResult);

@@ -61,6 +61,8 @@ STextEditorView::STextEditorView(QWidget *parent) :
 
     actionTextColor = tool_bar->addAction(QIcon::fromTheme("format-font-color"), tr("Font color"));
 
+    textEdit->setFocus();
+
     connect(grp, SIGNAL(triggered(QAction*)), this, SLOT(textAlign(QAction*)));
     connect(textEdit, SIGNAL(currentCharFormatChanged(QTextCharFormat)),
             this, SLOT(currentCharFormatChanged(QTextCharFormat)));
@@ -222,6 +224,8 @@ STextEditor::STextEditor(QWidget *parent) :
     okButton->setEnabled(false);
     cancelButton = buttons->addButton(tr("Cancel"), QDialogButtonBox::RejectRole);
     QLayout *mainLayout = new QVBoxLayout(this);
+
+    editor->setFocus();
 
     connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));

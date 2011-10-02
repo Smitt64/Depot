@@ -33,7 +33,9 @@ private slots:
     void questTypeChanged(int index);
     void addResourceFromRedactor(QString name, QByteArray data);
     void validQestion(bool isValid);
+#ifndef S_OS_MEEGO
     void showHelp();
+#endif
 
 private:
     QDialogButtonBox  *buttons;

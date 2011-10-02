@@ -1,15 +1,19 @@
 ﻿#include "sapplication.h"
 #include "sproject.h"
+#ifndef S_OS_MEEGO
 #include "shelpcontentviewwidget.h"
+#endif
 #include <QMessageBox>
 
 SApplication *SApplication::s_App = NULL;
 
 SApplication::SApplication(int argc, char *args[]) :
     s_project(NULL),
-    mainWnd(NULL),
-    s_helpView(NULL),
+    mainWnd(NULL)
+#ifndef S_OS_MEEGO
+    ,s_helpView(NULL),
     helpEngine(NULL)
+#endif
 {
     QCoreApplication::setOrganizationName("Serpkov_Nikita");
     QCoreApplication::setApplicationName("TestBuilder");
@@ -19,16 +23,11 @@ SApplication::SApplication(int argc, char *args[]) :
     log = new QFile("log.txt");
     bool opened = log->open(QIODevice::ReadWrite | QIODevice::Text);
     QTextStream stream(log);
-    /*QDir dir = QDir::current();
-    dir.cd("..");*/
 
+#ifndef S_OS_MEEGO
     helpEngine = new QHelpEngine("../doc/depot_doc_collection.qhc");
-                /*QString("%1/doc/depot_doc_collection.qhc")
-                                 .arg(dir.path()));*/
     stream << QDir::current().path() << helpEngine->error();
-    //qDebug() << QString("%1/doc/depot_doc_collection.qhc")
-                //.arg(dir.path());
-                //"../doc/depot_doc_collection.qhc");
+#endif
     QSettings set;
 
     resource = new FSHANDLE;
@@ -96,6 +95,7 @@ CMainWindow *SApplication::mainWindow() {
     return mainWnd;
 }
 
+#ifndef S_OS_MEEGO
 QByteArray SApplication::helpData(QString name) {
     return helpEngine->fileData(QUrl(name));
 }
@@ -108,3 +108,4 @@ QWidget *SApplication::helpViewWidget(bool makeControls) {
 QHelpEngine *SApplication::assistantEngine() {
     return helpEngine;
 }
+#endif

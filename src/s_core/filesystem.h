@@ -1,6 +1,7 @@
 ﻿#ifndef FILESYSTEM_H
 #define FILESYSTEM_H
 
+#include "s_core_global.h"
 #include <QString>
 #include <QFile>
 #include <QList>
@@ -34,7 +35,7 @@ typedef struct ArchHandle
     Header *dataHeader;//Заголовок архива
 }FSHANDLE;
 
-class FileSystem
+class S_CORESHARED_EXPORT FileSystem
 {
 
 public:

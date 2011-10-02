@@ -101,13 +101,31 @@ void SToolBar::paintEvent(QPaintEvent *event) {
         QToolBar::paintEvent(event);
     else {
         QPainter painter(this);
-        QPixmap positioner;//(":/insert_at");
+        QPixmap positioner;
+        QPainter tmp_painter;
+        int h = (orientation() == Qt::Horizontal ? height() : width());
+        QPixmap tmp = QPixmap(6, h);
+        tmp.fill(Qt::transparent);
+        tmp_painter.begin(&tmp);
+        tmp_painter.setPen(Qt::black);
+        //top lines
+        tmp_painter.drawLine(QPoint(0, 0), QPoint(6, 0));
+        tmp_painter.drawLine(QPoint(1, 1), QPoint(4, 1));
+        //bottom lines
+        tmp_painter.drawLine(QPoint(1, h - 2), QPoint(4, h - 2));
+        tmp_painter.drawLine(QPoint(0, h - 1), QPoint(6, h - 1));
+        //center line
+        QPen pen;
+        pen.setWidth(2);
+        pen.setColor(Qt::black);
+        tmp_painter.setPen(pen);
+        tmp_painter.drawLine(QPoint(3, 1), QPoint(3, h - 2));
+        tmp_painter.end();
         if(orientation() == Qt::Horizontal) {
-            positioner.load(":/insert_at");
+            positioner = tmp;
         } else {
-            QPixmap tmp(":/insert_at");
             positioner = QPixmap(event->rect().width(), tmp.width());
-            positioner.fill(Qt::red);
+            positioner.fill(Qt::transparent);
             QPainter posPaint(&positioner);
             posPaint.save();
             posPaint.translate(positioner.width() / 2, 0);

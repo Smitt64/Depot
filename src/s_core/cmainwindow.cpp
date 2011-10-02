@@ -13,7 +13,9 @@ CMainWindow::CMainWindow(QWidget *parent) :
     viewMenu(NULL),
     viewSeparator(NULL)
 {
+#ifndef S_OS_MEEGO
     setProperty("size", QSize(640, 480));
+#endif
     setCentralWidget(new QWidget);
     setDocumentMode(false);
     setDockNestingEnabled(true);
@@ -256,7 +258,7 @@ void CMainWindow::makeViewMenu() {
     connect(sactions["sb"], SIGNAL(triggered(bool)), this, SLOT(checkStatusBar(bool)));
 
     viewSeparator = menus["View"]->addSeparator();
-    QAction *fullscrAction = addAction(tr("Full screen"), "fullscreen", "View", QIcon(":/fullscreen"));
+    QAction *fullscrAction = addAction(tr("Full screen"), "fullscreen", "View", QIcon::fromTheme("view-fullscreen"));
     fullscrAction->setCheckable(true);
     fullscrAction->setStatusTip(tr("Show window full screen..."));
     fullscrAction->setShortcut(QKeySequence(Qt::SHIFT + Qt::ALT + Qt::Key_Enter));
@@ -397,4 +399,14 @@ void CMainWindow::customizeDlgClosed(int result) {
     doc.appendChild(root);
     doc.save(stream, 3);
     SApplication::inst()->writeSettings("window/user_toolbars", data);
+}
+
+void CMainWindow::showExpanded() {
+#if defined(Q_OS_SYMBIAN) || defined(MEEGO_EDITION_HARMATTAN) || defined(Q_WS_SIMULATOR)
+    showFullScreen();
+#elif defined(Q_WS_MAEMO_5)
+    showMaximized();
+#else
+    show();
+#endif
 }

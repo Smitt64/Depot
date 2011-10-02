@@ -5,6 +5,7 @@
 
 class XmlConfigDialog : public QDialog
 {
+    Q_OBJECT
 public:
     XmlConfigDialog(QWidget *parent = 0);
 

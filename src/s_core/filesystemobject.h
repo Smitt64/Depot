@@ -1,10 +1,11 @@
 #ifndef FILESYSTEMOBJECT_H
 #define FILESYSTEMOBJECT_H
 
+#include "s_core_global.h"
 #include <QObject>
 #include "filesystem.h"
 
-class FileSystemObject : public QObject
+class S_CORESHARED_EXPORT FileSystemObject : public QObject
 {
     Q_OBJECT
 public:

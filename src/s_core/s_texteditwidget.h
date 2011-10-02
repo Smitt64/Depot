@@ -1,9 +1,10 @@
 #ifndef S_TEXTEDITWIDGET_H
 #define S_TEXTEDITWIDGET_H
 
+#include "s_core_global.h"
 #include <QTextEdit>
 
-class STextEditWidget : public QTextEdit
+class S_CORESHARED_EXPORT STextEditWidget : public QTextEdit
 {
     Q_OBJECT
 public:

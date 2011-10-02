@@ -1,6 +1,7 @@
 ﻿#ifndef SMAINWINDOW_H
 #define SMAINWINDOW_H
 
+#include "s_core_global.h"
 #include <QWidget>
 #include <QMainWindow>
 #include <QMenuBar>
@@ -14,7 +15,7 @@
 #include "stoolbar.h"
 #include "scustomizedlg.h"
 
-class CMainWindow : public QMainWindow {
+class S_CORESHARED_EXPORT CMainWindow : public QMainWindow {
     Q_OBJECT
 
     friend class SToolBar;
@@ -41,6 +42,9 @@ public:
 
     QAction *action(const QString &title);
     QList<QAction*> actionList();
+
+public slots:
+    void showExpanded();
 
 private slots:
     void checkToolBars(bool value);
