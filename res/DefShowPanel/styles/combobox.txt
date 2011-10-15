@@ -1,0 +1,98 @@
+QComboBox[editable="true"]
+{
+border-image: url(${frame}) 4;
+border-width: 3;
+}
+
+QComboBox[editable="false"],
+QComboBox[editable="true"]::drop-down {
+border-image: url(${pushbutton}) 5;
+border-width: 5;
+}
+
+QComboBox[editable="false"]:hover,
+QComboBox[editable="true"]::drop-down:hover, QMenuBar::item:hover {
+border-image: url(${pushbutton_hover}) 5;
+border-width: 5;
+}
+
+QComboBox[editable="false"]:on,
+QComboBox[editable="true"]::drop-down:on, QMenuBar::item:on {
+border-image: url(${pushbutton_pressed}) 5;
+border-width: 5;
+}
+
+QComboBox[editable="false"] {
+padding-left: 3px;
+padding-right: 20px;
+}
+
+QComboBox[editable="false"]::drop-down {
+subcontrol-origin: padding;
+subcontrol-position: top right;
+width: 15px;
+border-left-style: solid;
+border-left-color: darkgray;
+border-left-width: 1px;
+}
+
+QComboBox[editable="false"]::down-arrow 
+{
+	subcontrol-origin: content;
+	subcontrol-position: center;
+	position: relative;
+	left: 1px;
+}
+
+QComboBox[editable="false"]::down-arrow:on 
+{
+	position: relative;
+	top: 1px;
+	left: 2px;
+}
+
+QComboBox[editable="true"] 
+{
+	padding-right: 16px;
+}
+
+QComboBox[editable="true"]::drop-down 
+{
+	subcontrol-origin: border;
+	subcontrol-position: top right;
+	width: 13px;
+	position: absolute;
+	top: 2px;
+	bottom: 2px;
+	right: 2px;
+}
+
+QComboBox[editable="true"]::drop-down,
+QComboBox[editable="true"]::drop-down:hover,
+QComboBox[editable="true"]::drop-down:on 
+{
+	border-width: 0px; 
+	border-left-width: 3px; 
+	background-color: ${color};
+}
+
+QComboBox[editable="true"]::down-arrow:on 
+{
+	position: relative;
+	top: 1px;
+	left: 1px;
+}
+
+QComboBox QAbstractItemView {
+  border-image: url(${frame}) 4;
+  border-width: 3;
+}
+
+QScrollBar:vertical
+{
+	border: 1px solid grey;
+	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, 	
+		stop: 0 ${color1}, stop: 1 ${color2});
+	border-bottom-color: rgba(255, 255, 255, 0);
+	width: 15px;
+}

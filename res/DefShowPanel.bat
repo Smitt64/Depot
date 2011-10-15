@@ -1,0 +1,1 @@
+rcc -binary DefShowPanel.qrc -compress 2 -o ../bin/DefShowPanel.brc

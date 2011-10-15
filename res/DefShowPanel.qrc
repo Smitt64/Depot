@@ -1,0 +1,39 @@
+<RCC>
+  <qresource prefix="/">
+    <file>DefShowPanel/styles/pushbutton.txt</file>
+    <file>DefShowPanel/styles/combobox.txt</file>
+    <file>DefShowPanel/styles/defaultshowpanel.txt</file>
+    <file>DefShowPanel/images/checkbox_checked.png</file>
+    <file>DefShowPanel/images/checkbox_checked_hover.png</file>
+    <file>DefShowPanel/images/checkbox_checked_pressed.png</file>
+    <file>DefShowPanel/images/checkbox_unchecked.png</file>
+    <file>DefShowPanel/images/checkbox_unchecked_hover.png</file>
+    <file>DefShowPanel/images/checkbox_unchecked_pressed.png</file>
+    <file>DefShowPanel/images/down_arrow.png</file>
+    <file>DefShowPanel/images/down_arrow_disabled.png</file>
+    <file>DefShowPanel/images/fileinfo-16.png</file>
+    <file>DefShowPanel/images/frame.png</file>
+    <file>DefShowPanel/images/pagefold.png</file>
+    <file>DefShowPanel/images/pushbutton.png</file>
+    <file>DefShowPanel/images/pushbutton_hover.png</file>
+    <file>DefShowPanel/images/pushbutton_pressed.png</file>
+    <file>DefShowPanel/images/radiobutton_checked.png</file>
+    <file>DefShowPanel/images/radiobutton_checked_hover.png</file>
+    <file>DefShowPanel/images/radiobutton_checked_pressed.png</file>
+    <file>DefShowPanel/images/radiobutton_unchecked.png</file>
+    <file>DefShowPanel/images/radiobutton_unchecked_hover.png</file>
+    <file>DefShowPanel/images/radiobutton_unchecked_pressed.png</file>
+    <file>DefShowPanel/images/sizegrip.png</file>
+    <file>DefShowPanel/images/spindown.png</file>
+    <file>DefShowPanel/images/spindown_hover.png</file>
+    <file>DefShowPanel/images/spindown_off.png</file>
+    <file>DefShowPanel/images/spindown_pressed.png</file>
+    <file>DefShowPanel/images/spinup.png</file>
+    <file>DefShowPanel/images/spinup_hover.png</file>
+    <file>DefShowPanel/images/spinup_off.png</file>
+    <file>DefShowPanel/images/spinup_pressed.png</file>
+    <file>DefShowPanel/images/up_arrow.png</file>
+    <file>DefShowPanel/images/up_arrow_disabled.png</file>
+    <file>DefShowPanel/images/back.png</file>
+  </qresource>
+</RCC>

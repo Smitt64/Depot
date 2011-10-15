@@ -1,32 +1,33 @@
 <RCC>
-    <qresource prefix="/">
-        <file alias="new">toolbar/DocumentHS.png</file>
-        <file alias="open">toolbar/openHS.png</file>
-        <file alias="print">toolbar/PrintHS.png</file>
-        <file alias="saveall">toolbar/SaveAllHS.png</file>
-        <file alias="save">toolbar/saveHS.png</file>
-        <file alias="fullscreen">toolbar/FullScreenHS.png</file>
-        <file alias="legend">toolbar/LegendHS.png</file>
-        <file alias="book">icons/book.png</file>
-        <file alias="group">icons/group.png</file>
-        <file alias="quest">icons/question.png</file>
-        <file alias="redo">toolbar/Edit_RedoHS.png</file>
-        <file alias="undo">toolbar/Edit_UndoHS.png</file>
-        <file alias="addtheme">toolbar/add_theme.png</file>
-        <file alias="removetheme">toolbar/remove_theme.png</file>
-        <file alias="theme">icons/theme.png</file>
-        <file alias="themegroup">icons/theme_group.png</file>
-        <file alias="separator">icons/separator.png</file>
-        <file alias="align_center">toolbar/AlignCenter.png</file>
-        <file alias="align_left">toolbar/AlignLeft.PNG</file>
-        <file alias="align_right">toolbar/AlignRight.png</file>
-        <file alias="text_bold">toolbar/boldhs.png</file>
-        <file alias="text_italic">toolbar/ItalicHS.png</file>
-        <file alias="underline">toolbar/underline.png</file>
-        <file alias="align_justify">toolbar/AlignJustify.png</file>
-        <file alias="font_color">toolbar/Color_fontHS.png</file>
-        <file alias="insert_at">icons/insertAt.png</file>
-        <file alias="add_quest">toolbar/addQuestion.png</file>
-        <file alias="removeQuestion">toolbar/remove_question.png</file>
+    <qresource prefix="/icons">
+        <file>Depot_XP/actions/document-new.png</file>
+        <file>Depot_XP/actions/document-open.png</file>
+        <file>Depot_XP/actions/document-print.png</file>
+        <file>Depot_XP/actions/document-save.png</file>
+        <file>Depot_XP/actions/document-save-as.png</file>
+        <file>Depot_XP/actions/edit-redo.png</file>
+        <file>Depot_XP/actions/edit-undo.png</file>
+        <file>Depot_XP/actions/format-font-color.png</file>
+        <file>Depot_XP/actions/format-justify-center.png</file>
+        <file>Depot_XP/actions/format-justify-fill.png</file>
+        <file>Depot_XP/actions/format-justify-left.PNG</file>
+        <file>Depot_XP/actions/format-justify-right.png</file>
+        <file>Depot_XP/actions/format-text-bold.png</file>
+        <file>Depot_XP/actions/format-text-italic.png</file>
+        <file>Depot_XP/actions/format-text-underline.png</file>
+        <file>Depot_XP/actions/LegendHS.png</file>
+        <file>Depot_XP/actions/test-add-question.png</file>
+        <file>Depot_XP/actions/test-add-theme.png</file>
+        <file>Depot_XP/actions/test-remove_question.png</file>
+        <file>Depot_XP/actions/test-remove_theme.png</file>
+        <file>Depot_XP/actions/tst_xml-config.png</file>
+        <file>Depot_XP/actions/view-fullscreen.png</file>
+        <file>Depot_XP/objects/application-insertAt.png</file>
+        <file>Depot_XP/objects/application-separator.png</file>
+        <file>Depot_XP/objects/test-book.png</file>
+        <file>Depot_XP/objects/test-question.png</file>
+        <file>Depot_XP/objects/test-theme.png</file>
+        <file>Depot_XP/objects/test-theme_group.png</file>
+        <file>Depot_XP/index.theme</file>
     </qresource>
 </RCC>

@@ -1,0 +1,15 @@
+QPushButton {
+  min-width: 50;
+  border-image: url(${pushbutton}) 5;
+  border-width: 5;
+}
+
+QPushButton:hover {
+  border-image: url(${pushbutton_hover}) 5;
+  border-width: 5;
+}
+
+QPushButton:pressed {
+  border-image: url(${pushbutton_pressed}) 5;
+  border-width: 5;
+}
