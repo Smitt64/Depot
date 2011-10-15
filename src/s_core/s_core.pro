@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 include(../../build.pri)
-QT += network sql webkit xml xmlpatterns
+QT += network sql webkit xml xmlpatterns declarative
 
 TARGET = s_core
 TEMPLATE = lib
@@ -36,7 +36,8 @@ SOURCES += s_core.cpp \
     commands.cpp \
     cmainwindow.cpp \
     defaulttesttypes/default_tst_types.cpp \
-    msstyle/windowsmodernstyle.cpp
+    msstyle/windowsmodernstyle.cpp \
+    showpanel/defaultshowpanel.cpp
 
 
 HEADERS += s_core.h\
@@ -57,7 +58,8 @@ HEADERS += s_core.h\
     interfaces/testtype_interface.h \
     interfaces/questeditor_interface.hpp \
     msstyle/windowsmodernstyle.h \
-    interfaces/showpanel_interface.h
+    interfaces/showpanel_interface.h \
+    showpanel/defaultshowpanel.h
 
 symbian {
     MMP_RULES += EXPORTUNFROZEN
@@ -83,4 +85,10 @@ unix:!symbian {
     HEADERS += shelpcontentviewwidget.h
     CONFIG += help
 }
+
+
+
+
+
+
 

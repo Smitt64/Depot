@@ -6,6 +6,7 @@
 #include "sproject.h"
 #include "cmainwindow.h"
 
+#include <QtSql>
 #include <QApplication>
 #include <QSettings>
 #include <QIcon>
@@ -19,9 +20,10 @@
 #define VERSION "1.0.0"
 #define SAFE_DELETE(p) if((p) != NULL) delete(p); (p) = NULL;
 
-class S_CORESHARED_EXPORT SApplication {
+class S_CORESHARED_EXPORT SApplication : public QObject {
+    Q_OBJECT
 public:
-    SApplication(int argc, char *args[]);
+    explicit SApplication(int argc, char *args[], QObject *parent = 0);
     ~SApplication();
 
     static SApplication *inst();
@@ -36,12 +38,18 @@ public:
     void setMainWindow(CMainWindow *value);
     CMainWindow *mainWindow();
 
+    bool openDataBase();
+    QString lastDatabaseError() const;
+
     QObject *project();
 #ifndef S_OS_MEEGO
     QByteArray helpData(QString name);
     QHelpEngine *assistantEngine();
     QWidget *helpViewWidget(bool makeControls = false);
 #endif
+
+signals:
+    void db_error(int err_type, QString msg1, QString msg2);
 
 private:
     static SApplication *s_App;
@@ -54,5 +62,7 @@ private:
     QObject *s_project;
     CMainWindow *mainWnd;
     QFile *log;
+    QSqlDatabase db;
+    QString last_db_errorMsg;
 };
 #endif

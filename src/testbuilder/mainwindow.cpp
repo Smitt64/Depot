@@ -12,6 +12,8 @@
 #include "dialogs/editquestion.h"
 #include "dialogs/edittheme.h"
 #include "dialogs/xmlconfigdialog.h"
+#include "showpanel/defaultshowpanel.h"
+#include "showpanelstyle.h"
 
 #ifndef S_OS_MEEGO
 #include "shelpcontentviewwidget.h"
@@ -28,6 +30,10 @@ MainWindow::MainWindow(QWidget *parent) :
     MaxRecentFiles(5),
     theme_mehu(NULL)
 {
+    if(!SApplication::inst()->openDataBase()) {
+        QMessageBox::warning(this, "Error!", SApplication::inst()->lastDatabaseError());
+    }
+
     mdiArea = new QMdiArea(this);
     mdiArea->setDocumentMode(false);
     mdiArea->setViewMode(QMdiArea::TabbedView);
@@ -37,6 +43,10 @@ MainWindow::MainWindow(QWidget *parent) :
     subWindow->setAttribute(Qt::WA_DeleteOnClose);
     subWindow->showMaximized();
 #endif
+    DefaultShowPanel *panel = new DefaultShowPanel(this);
+    QMdiSubWindow *subWindow2 = mdiArea->addSubWindow(panel);
+    subWindow2->setAttribute(Qt::WA_DeleteOnClose);
+    subWindow2->showMaximized();
 
     setCentralWidget(mdiArea);
 
@@ -123,11 +133,6 @@ MainWindow::MainWindow(QWidget *parent) :
     updateRecentFileActions();
 
     restore();
-
-    /*QTableView *table = new QTableView;
-    table->setModel(S_PROJECT->questions());
-    QMdiSubWindow *subWindow2 = mdiArea->addSubWindow(table);
-    subWindow2->setAttribute(Qt::WA_DeleteOnClose);*/
 
     connect(create, SIGNAL(triggered()), this, SLOT(createProject()));
     connect(open, SIGNAL(triggered()), this, SLOT(openProject()));
@@ -295,7 +300,6 @@ void MainWindow::addQuestion() {
 
 void MainWindow::questionAdded(QString alias, QString label, QStringList toThemes) {
     int thCount = theme_item->childCount();
-    qDebug() << toThemes;
     for(int i = 0; i < thCount; i++) {
         QTreeWidgetItem *child = theme_item->child(i);
         QString themeAlias = child->text(1);

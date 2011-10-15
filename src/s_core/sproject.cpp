@@ -13,7 +13,6 @@
 
 SProject::SProject(QObject *parent) :
     QObject(parent),
-    //file_handle(NULL),
     fsManager(NULL),
     thmes_counter(0),
     res_counter(0),
@@ -670,4 +669,15 @@ QDomElement SProject::makeElement(const QString &xml_string) {
     }
 
     return doc.documentElement();
+}
+
+QStringList SProject::db_groups() const {
+    QStringList result;
+    QSqlQuery query;
+    query.prepare("SELECT caption FROM groups;");
+    if(query.exec()) {
+        while(query.next())
+            result << query.value(0).toString();
+    }
+    return result;
 }

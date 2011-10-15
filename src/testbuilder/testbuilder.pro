@@ -1,5 +1,5 @@
 include(../../build.pri)
-QT += core gui sql xml xmlpatterns webkit
+QT += core gui sql xml xmlpatterns webkit declarative
 
 TARGET = TestBuilder
 TEMPLATE = app

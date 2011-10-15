@@ -7,9 +7,11 @@
 
 SApplication *SApplication::s_App = NULL;
 
-SApplication::SApplication(int argc, char *args[]) :
+SApplication::SApplication(int argc, char *args[], QObject *parent) :
+    QObject(parent),
     s_project(NULL),
-    mainWnd(NULL)
+    mainWnd(NULL),
+    last_db_errorMsg(QString::null)
 #ifndef S_OS_MEEGO
     ,s_helpView(NULL),
     helpEngine(NULL)
@@ -53,9 +55,11 @@ QApplication *SApplication::app() {
 }
 
 bool SApplication::setResourcePackage(const QString &filename) {
-    bool hr = FileSystem::getInst()->fsOpen(filename, resource);
+    /*bool hr = FileSystem::getInst()->fsOpen(filename, resource);
     FileSystem::getInst()->fsClose(resource);
-    return hr;
+    return hr;*/
+    QResource resource(filename);
+    return resource.registerResource(filename);
 }
 
 QIcon SApplication::iconResource(QString name) {
@@ -109,3 +113,32 @@ QHelpEngine *SApplication::assistantEngine() {
     return helpEngine;
 }
 #endif
+
+bool SApplication::openDataBase() {
+    QString data_b = settings("database/driver", "QSQLITE").toString();
+    db = QSqlDatabase::addDatabase(data_b);
+
+    bool hr = false;
+    if(data_b == "QSQLITE") {
+        db.setDatabaseName("../share/depot.sqlite");
+    } else {
+        db.setDatabaseName(settings("database/databasename").toString());
+        db.setHostName(settings("database/hostname").toString());
+        db.setPort(settings("database/port").toInt());
+        db.setUserName(settings("database/username").toString());
+        db.setPassword(settings("database/password").toString());
+    }
+
+    hr = db.open();
+    if(!hr) {
+        last_db_errorMsg = db.lastError().text();
+        emit db_error(db.lastError().type(), tr("Connection error!"), last_db_errorMsg);
+    } else {
+        last_db_errorMsg = QString::null;
+    }
+    return hr;
+}
+
+QString SApplication::lastDatabaseError() const{
+    return last_db_errorMsg;
+}

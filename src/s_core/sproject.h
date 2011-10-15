@@ -83,6 +83,8 @@ public:
     QStandardItemModel *questTypes();
     QStandardItemModel *themesModel();
 
+    QStringList db_groups() const;
+
     QuestEditorInterface *questEditing(const QString &name);
 
     bool regResource(const QString &questAlias, const QString &qResource);
