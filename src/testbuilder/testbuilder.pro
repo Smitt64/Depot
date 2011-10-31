@@ -17,14 +17,16 @@ SOURCES = main.cpp \
     dialogs/edittheme.cpp \
     dialogs/editquestion.cpp \
     xmlsyntaxhighlighter.cpp \
-    dialogs/xmlconfigdialog.cpp
+    dialogs/xmlconfigdialog.cpp \
+    dialogs/questionsspreadsheet.cpp
 
 HEADERS += \
     mainwindow.h \
     dialogs/edittheme.h \
     dialogs/editquestion.h \
     xmlsyntaxhighlighter.h \
-    dialogs/xmlconfigdialog.h
+    dialogs/xmlconfigdialog.h \
+    dialogs/questionsspreadsheet.h
 
 contains(MEEGO_EDITION,harmattan) {
     target.path = /opt/testbuilder/bin
@@ -44,3 +46,5 @@ warning($$OUT_PWD)
 
 INCLUDEPATH += $$PWD/../s_core
 DEPENDPATH += $$PWD/../s_core
+
+

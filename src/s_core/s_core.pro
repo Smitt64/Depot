@@ -37,7 +37,8 @@ SOURCES += s_core.cpp \
     cmainwindow.cpp \
     defaulttesttypes/default_tst_types.cpp \
     msstyle/windowsmodernstyle.cpp \
-    showpanel/defaultshowpanel.cpp
+    showpanel/defaultshowpanel.cpp \
+    showpanel/showpanelcomponents.cpp
 
 
 HEADERS += s_core.h\
@@ -59,7 +60,8 @@ HEADERS += s_core.h\
     interfaces/questeditor_interface.hpp \
     msstyle/windowsmodernstyle.h \
     interfaces/showpanel_interface.h \
-    showpanel/defaultshowpanel.h
+    showpanel/defaultshowpanel.h \
+    showpanel/showpanelcomponents.h
 
 symbian {
     MMP_RULES += EXPORTUNFROZEN
@@ -85,6 +87,8 @@ unix:!symbian {
     HEADERS += shelpcontentviewwidget.h
     CONFIG += help
 }
+
+
 
 
 

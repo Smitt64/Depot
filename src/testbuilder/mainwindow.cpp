@@ -12,6 +12,7 @@
 #include "dialogs/editquestion.h"
 #include "dialogs/edittheme.h"
 #include "dialogs/xmlconfigdialog.h"
+#include "dialogs/questionsspreadsheet.h"
 #include "showpanel/defaultshowpanel.h"
 #include "showpanelstyle.h"
 
@@ -133,6 +134,10 @@ MainWindow::MainWindow(QWidget *parent) :
     updateRecentFileActions();
 
     restore();
+
+    QuestionsSpreadSheet *spr = new QuestionsSpreadSheet;
+    QAction *spread = addAction(tr("Question spreadsheet"), "spreadsheet", "test", QIcon::fromTheme("xml_file"));
+    connect(spread, SIGNAL(triggered()), spr, SLOT(exec()));
 
     connect(create, SIGNAL(triggered()), this, SLOT(createProject()));
     connect(open, SIGNAL(triggered()), this, SLOT(openProject()));

@@ -6,34 +6,6 @@
 #include "../showpanelstyle.h"
 #include <QtGui>
 
-class ShowPanelPushButton : public QPushButton
-{
-    Q_OBJECT
-public:
-    explicit ShowPanelPushButton(QColor color, QWidget *parent = 0);
-    ~ShowPanelPushButton();
-
-public slots:
-    void setColor(QColor color);
-
-private:
-    QColor buttonColor;
-};
-
-class ShowPanelComboBox : public QComboBox
-{
-    Q_OBJECT
-public:
-    explicit ShowPanelComboBox(QColor color, QWidget *parent = 0);
-    ~ShowPanelComboBox();
-
-public slots:
-    void setColor(QColor color);
-
-private:
-    QColor comboColor;
-};
-
 class S_CORESHARED_EXPORT ViewWidget : public QWidget
 {
     Q_OBJECT
@@ -42,9 +14,16 @@ public:
 
 public slots:
     void setColor(QColor color);
+    void onPushButton();
+
+    void enterStartScreen();
+
+signals:
+    void colorChanged(QColor color);
 
 private:
     QColor panelColor;
+    bool enableAnimation;
     QPushButton *startButton;
     QComboBox *groupCombo;
 
@@ -59,6 +38,7 @@ public:
     explicit DefaultShowPanel(QWidget *parent = 0);
 
 signals:
+    void colorChanged(QColor color);
 
 public slots:
     void setColor(QColor color);
